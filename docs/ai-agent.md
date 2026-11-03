@@ -76,7 +76,7 @@ It does not send patient names or result values. It also does not send free-text
 | Mode | What runs |
 |---|---|
 | LIVE | The real `%AI.Agent`, with a provider and model from `.env`. |
-| REPLAY | `CareBridge.Engine.ReplayAgent` stands in for the model. It replays a recorded tool plan against the real lookups, then puts a recorded reply through the same validator and policy gate. No key is needed. |
+| REPLAY | `CareBridge.Engine.ReplayAgent` stands in for the model. It runs a scripted tool plan against the real lookups, then puts a scripted, hand-written reply through the same validator and policy gate. No key is needed. |
 
 Set the mode with `CAREBRIDGE_AGENT_MODE`, or from the dashboard unless `CAREBRIDGE_LOCK_MODE` is set. Every `AgentRun` records its mode, provider and model.
 

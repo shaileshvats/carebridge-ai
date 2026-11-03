@@ -126,7 +126,7 @@ See [docs/testing.md](docs/testing.md) for what each suite covers and the latest
 
 ## Configure live AI
 
-REPLAY mode runs the real production, real tools, real contract validator and real policy gate. Only the model's reply is a recorded fixture, and the dashboard shows which mode is active. For LIVE mode, copy `.env.example` to `.env` and choose a provider:
+REPLAY mode runs the real production, real tools, real contract validator and real policy gate. Only the model's reply is a scripted fixture, and the dashboard shows which mode is active. For LIVE mode, copy `.env.example` to `.env` and choose a provider:
 
 ```bash
 CAREBRIDGE_AGENT_MODE=LIVE
@@ -174,7 +174,7 @@ More documentation:
 - All data is synthetic, and the HIS, LIS and EMR are simulations inside the same container. CareBridge has not been used in a hospital and makes no regulatory claim.
 - Only one workflow is covered: ORU^R01 lab results with six exception types.
 - The dashboard and API are unauthenticated demo applications, bound to localhost by Compose. Reviewer identities are synthetic.
-- REPLAY fixtures are recorded replies; the adversarial ones deliberately imitate a misbehaving model to test the gate.
+- REPLAY fixtures are hand-written replies, not recordings of a live model; the adversarial ones deliberately imitate a misbehaving model to test the gate.
 - AI Hub is pre-release software, and APIs may change between builds.
 
 ## Licence

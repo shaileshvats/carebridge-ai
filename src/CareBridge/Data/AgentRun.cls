@@ -8,7 +8,7 @@ Property ExceptionCase As CareBridge.Data.ExceptionCase;
 
 Property AgentName As %String(MAXLEN = 80) [ InitialExpression = "CareBridge.ExceptionInvestigator" ];
 
-/// LIVE (real AI Hub agent and model) or REPLAY (recorded recommendation, real tools).
+/// LIVE (real AI Hub agent and model) or REPLAY (scripted recommendation, real tools).
 Property Mode As %String(MAXLEN = 10);
 
 Property Provider As %String(MAXLEN = 40);

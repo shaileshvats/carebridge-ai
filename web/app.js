@@ -41,10 +41,10 @@
       const [mode, review, health] = await Promise.all([api("/mode"), api("/review"), api("/health")]);
       const badge = document.getElementById("mode-badge");
       badge.className = "mode-badge " + (mode.mode === "LIVE" ? "live" : "replay");
-      badge.textContent = mode.mode === "LIVE" ? `LIVE AI · ${mode.model || ""}` : "REPLAY mode · recorded agent output";
+      badge.textContent = mode.mode === "LIVE" ? `LIVE AI · ${mode.model || ""}` : "REPLAY mode · scripted agent output";
       badge.title = mode.mode === "LIVE"
         ? `Live AI Hub agent. Provider ${mode.provider}, model ${mode.model}${mode.baseUrl ? ", endpoint " + mode.baseUrl : ""}`
-        : "The IRIS production runs for real; the agent's reply is a recorded fixture (no model call).";
+        : "The IRIS production runs for real; the agent's reply is a scripted fixture (no model call).";
       const c = document.getElementById("review-count");
       c.hidden = !review.length; c.textContent = review.length;
       document.getElementById("health").textContent =
@@ -152,7 +152,7 @@
     return `<div class="card">
       <div class="section-title"><h3>Agent run ${esc(run.runId)} · ${esc(run.agent)}</h3>${pill(run.outcome)}</div>
       <dl class="kv">
-        <dt>Mode</dt><dd>${pill(run.mode)} ${run.mode === "REPLAY" ? '<span class="muted">recorded reply, real tool calls</span>' : ""}</dd>
+        <dt>Mode</dt><dd>${pill(run.mode)} ${run.mode === "REPLAY" ? '<span class="muted">scripted reply, real tool calls</span>' : ""}</dd>
         <dt>Provider / model</dt><dd>${esc(run.provider)} · ${esc(run.model)}</dd>
         <dt>Started</dt><dd>${fmtTime(run.startedAt)} · ${esc(run.durationMs)} ms · ${esc(run.attempts)} attempt(s)</dd>
         <dt>Tokens</dt><dd>${esc(tokens)}</dd>
@@ -305,7 +305,7 @@
         <div class="card"><div class="section-title"><h2>Agent mode</h2>${pill(mode.mode)}</div>
           <p style="margin:0 0 .5rem">${mode.mode === "LIVE"
             ? `LIVE: the AI Hub agent calls <strong>${esc(mode.provider)}</strong> model <strong>${esc(mode.model)}</strong>${mode.baseUrl ? ` at <code>${esc(mode.baseUrl)}</code>` : ""}. Adversarial scenarios then test the real model instead of fixtures.`
-            : "REPLAY: the production, tools, contract validator and policy gate all run for real; the agent's reply is a recorded fixture. No API key needed."}</p>
+            : "REPLAY: the production, tools, contract validator and policy gate all run for real; the agent's reply is a scripted fixture. No API key needed."}</p>
           ${mode.modeLocked ? '<p class="muted" style="margin:0">Mode switching is disabled on this deployment.</p>' :
             `<button id="toggle-mode" ${mode.mode === "REPLAY" && !mode.liveAvailable ? "disabled" : ""}>Switch to ${mode.mode === "LIVE" ? "REPLAY" : "LIVE"}</button>
              ${!mode.liveAvailable ? '<span class="muted">AI Hub classes not available in this instance.</span>' : (mode.mode === "REPLAY" && !mode.keyConfigured ? '<span class="muted">No model key or endpoint configured; LIVE runs will fall back to manual review.</span>' : "")}`}

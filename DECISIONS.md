@@ -24,7 +24,7 @@ Every evidence code in a recommendation must appear in the case's deterministic 
 `ContextBuilder` sends identifiers, codes, presence flags and findings only. NTE text is reduced to `freeTextPresent`, names are omitted, OBX values are replaced by `hasValue`. Prompt injection in HL7 notes therefore cannot reach a live model; the replay `prompt-injection` fixture still tests the gate as if it had.
 
 ## D8. Replay mode is a deterministic agent adapter, not a mock workflow
-REPLAY executes the same production, the same read-only lookups (recorded tool plan, real results), the same contract validator and the same policy gate. Only the model's reply text is recorded. The dashboard and every AgentRun row label the mode.
+REPLAY executes the same production, the same read-only lookups (a scripted tool plan executed against real data), the same contract validator and the same policy gate. Only the model's reply text is scripted: the fixtures were written by hand to match the contract, and the adversarial ones deliberately imitate a misbehaving model. They are not recordings of a live model. The dashboard and every AgentRun row label the mode.
 
 ## D9. Manual review uses the Interoperability Workflow Engine
 `CareBridge.ManualReview` is an `EnsLib.Workflow.Operation`; review tasks are `EnsLib.Workflow.TaskRequest`s for the role of the same name. The decision returns to the router's `OnResponse`, so human decisions are governed exactly like agent ones. (This is also a listed contest technology bonus, but it was chosen because it is the platform's own mechanism for handing work to people.)

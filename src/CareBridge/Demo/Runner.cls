@@ -37,7 +37,7 @@ ClassMethod RunScenario(name As %String, timeoutSeconds As %Integer = 0) As %Dyn
 	Set last = out.messages.%Get(out.messages.%Size() - 1)
 	Set outcome = $SELECT($ISOBJECT(last)&&$ISOBJECT(last.final):last.final.outcome, 1:"")
 	Set out.outcome = outcome
-	// REPLAY is deterministic, so the exact recorded outcome is required. A LIVE model may choose any
+	// REPLAY is deterministic, so the exact scripted outcome is required. A LIVE model may choose any
 	// action the policy allows; the scenario then passes if the outcome is one of its safe outcomes.
 	Set mode = ##class(CareBridge.Operation.ExceptionInvestigator).ActiveMode()
 	Set out.mode = mode

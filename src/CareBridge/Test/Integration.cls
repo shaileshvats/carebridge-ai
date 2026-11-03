@@ -98,6 +98,8 @@ Method TestRetryAfterDownstreamFailure()
 	Do $$$AssertEquals(rec.DeliveryAttempts, 2, "Failed once, delivered on retry")
 	Set ev = ..Events(corr)
 	For e = "DELIVERY_FAILED", "RETRY_SCHEDULED", "RETRY_DUE", "RETRY_STARTED", "DELIVERED" { Do $$$AssertTrue($LISTFIND(ev, e), "audit has "_e) }
+	Set delay = ..Count("SELECT DATEDIFF('s', CreatedAt, DueAt) FROM CareBridge_Data.QueueItem WHERE CorrelationId = ? AND Queue = 'RETRY'", corr)
+	Do $$$AssertTrue(delay >= 10, "Retry is scheduled after the configured delay ("_delay_"s), not immediately")
 }
 
 Method TestAdversarialRecommendationsAreBlocked()

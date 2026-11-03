@@ -152,7 +152,7 @@ Method Execute(action As %String, case As CareBridge.Data.ExceptionCase, record 
 		Set item = ##class(CareBridge.Data.QueueItem).%New()
 		Set item.Queue = "RETRY", item.CorrelationId = record.CorrelationId, item.ExceptionCase = case
 		Set item.Reason = reason
-		Set item.DueAt = $ZDATETIME($SYSTEM.SQL.Functions.DATEADD("s", ..RetryDelaySeconds, $ZDATETIME($ZTIMESTAMP, 3)), 3)
+		Set item.DueAt = $SYSTEM.SQL.Functions.DATEADD("s", ..RetryDelaySeconds, $ZDATETIME($ZTIMESTAMP, 3))
 		Set sc = item.%Save()
 		Do ..ResolveCase(case, "RETRY", decidedBy)
 		Do ..SetStatus(record.CorrelationId, "RETRY_PENDING")

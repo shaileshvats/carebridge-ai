@@ -1,6 +1,6 @@
 /// Deterministic agent test adapter used in REPLAY mode (no model, no API key).
-/// It replays a recorded tool plan against the real read-only lookups (so tool traces are real),
-/// then returns a recorded model reply that goes through the same contract validator and policy gate
+/// It runs a scripted tool plan against the real read-only lookups (so tool traces are real),
+/// then returns a scripted model reply (written by hand, not a recording of a live model) that goes through the same contract validator and policy gate
 /// as a live reply. Fixtures are selected by demo scenario, falling back to the exception type.
 /// The adversarial fixtures deliberately return unsafe output to exercise the policy gate.
 Class CareBridge.Engine.ReplayAgent Extends %RegisteredObject
@@ -10,32 +10,32 @@ XData Fixtures [ MimeType = application/json ]
 {
 {
   "UNKNOWN_PATIENT": {
-    "source": "recorded",
+    "source": "scripted",
     "tools": [["LookupPatient","patientRef"], ["LookupOrder","placerOrderNumber"], ["MessageHistory","correlationId"]],
     "outputs": ["{\"exception_type\":\"UNKNOWN_PATIENT\",\"recommended_action\":\"MANUAL_REVIEW\",\"reason\":\"The MRN is not in the HIS registry and the order is unknown. Registration may still be pending, so a person should decide rather than guess the patient.\",\"evidence\":[\"PATIENT_NOT_FOUND\",\"ORDER_NOT_FOUND\"],\"requires_human_review\":true}"]
   },
   "UNKNOWN_ORDER": {
-    "source": "recorded",
+    "source": "scripted",
     "tools": [["LookupPatient","patientRef"], ["LookupOrder","placerOrderNumber"], ["OrdersForPatient","patientRef"]],
     "outputs": ["{\"exception_type\":\"UNKNOWN_ORDER\",\"recommended_action\":\"MANUAL_REVIEW\",\"reason\":\"The patient is registered but the placer order number does not exist. The patient has other orders on file; matching to one of them would be guessing, so a person should review.\",\"evidence\":[\"ORDER_NOT_FOUND\",\"PATIENT_FOUND\"],\"requires_human_review\":true}"]
   },
   "DUPLICATE_RESULT": {
-    "source": "recorded",
+    "source": "scripted",
     "tools": [["DuplicateStatus","correlationId"], ["MessageHistory","correlationId"]],
     "outputs": ["{\"exception_type\":\"DUPLICATE_RESULT\",\"recommended_action\":\"DUPLICATE_SUPPRESSED\",\"reason\":\"Identical result content for this order was already delivered and this is not a correction, so forwarding it again would create a duplicate.\",\"evidence\":[\"DUPLICATE_CONTENT_DELIVERED\"],\"requires_human_review\":false}"]
   },
   "MISSING_REQUIRED_FIELDS": {
-    "source": "recorded",
+    "source": "scripted",
     "tools": [["ValidationFindings","correlationId"]],
     "outputs": ["{\"exception_type\":\"MISSING_REQUIRED_FIELDS\",\"recommended_action\":\"REJECT\",\"reason\":\"The patient identifier (PID-3) is missing, so the result cannot be attributed to anyone. The laboratory should correct and resend it.\",\"evidence\":[\"MISSING_FIELD:PID-3\"],\"requires_human_review\":false}"]
   },
   "PATIENT_ORDER_CONFLICT": {
-    "source": "recorded",
+    "source": "scripted",
     "tools": [["LookupPatient","patientRef"], ["LookupOrder","placerOrderNumber"]],
     "outputs": ["{\"exception_type\":\"PATIENT_ORDER_CONFLICT\",\"recommended_action\":\"MANUAL_REVIEW\",\"reason\":\"The order exists but was placed for a different patient than the one in PID-3. Patient identity is ambiguous and must be resolved by a person.\",\"evidence\":[\"ORDER_PATIENT_MISMATCH\",\"PATIENT_FOUND\",\"ORDER_FOUND\"],\"requires_human_review\":true}"]
   },
   "DOWNSTREAM_UNAVAILABLE": {
-    "source": "recorded",
+    "source": "scripted",
     "tools": [["ValidationFindings","correlationId"]],
     "outputs": ["{\"exception_type\":\"DOWNSTREAM_UNAVAILABLE\",\"recommended_action\":\"RETRY\",\"reason\":\"The result validated cleanly and only the delivery failed, which looks transient. Retry delivery.\",\"evidence\":[\"DOWNSTREAM_UNAVAILABLE\"],\"requires_human_review\":false}"]
   },
@@ -82,7 +82,7 @@ ClassMethod Run(run As CareBridge.Data.AgentRun, input As %DynamicObject, scenar
 		Quit out
 	}
 	Set out.fixtureSource = fx.source
-	// Replay the recorded tool plan against the real read-only lookups.
+	// Run the scripted tool plan against the real read-only lookups.
 	Set iter = fx.tools.%GetIterator()
 	While iter.%GetNext(.i, .step) {
 		Set tool = step.%Get(0), argName = step.%Get(1)
@@ -99,7 +99,7 @@ ClassMethod Run(run As CareBridge.Data.AgentRun, input As %DynamicObject, scenar
 		Set tc.Success = 1
 		Do tc.%Save()
 	}
-	// Recorded replies, one per attempt, through the real contract validator.
+	// Scripted replies, one per attempt, through the real contract validator.
 	Set n = fx.outputs.%Size()
 	For attempt = 1:1:3 {
 		Quit:attempt>n
