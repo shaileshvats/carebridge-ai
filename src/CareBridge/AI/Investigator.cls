@@ -8,7 +8,7 @@ Parameter MAXATTEMPTS = 3;
 /// Returns {outcome, recommendation, rawOutput, attempts, problems, promptTokens, completionTokens, provider, model}
 ClassMethod Run(run As CareBridge.Data.AgentRun, input As %DynamicObject) As %DynamicObject
 {
-	Set out = {"outcome":"PROVIDER_ERROR", "recommendation":"", "rawOutput":"", "attempts":0, "problems":[]}
+	Set out = {"outcome":"PROVIDER_ERROR", "recommendation":"", "rawOutput":"", "attempts":0, "problems":[], "rejectedAttempts":[]}
 	Set cfg = ##class(CareBridge.ExceptionInvestigator).ProviderSettings()
 	Set out.provider = cfg.provider, out.model = cfg.model
 	Try {
@@ -34,6 +34,7 @@ ClassMethod Run(run As CareBridge.Data.AgentRun, input As %DynamicObject) As %Dy
 				Quit
 			}
 			Set out.outcome = "INVALID_OUTPUT"
+			Do out.rejectedAttempts.%Push({"attempt":(attempt), "output":($EXTRACT(text, 1, 300)), "problems":(problems)})
 			Set prompt = "Your reply was rejected by the CareBridge contract validator: "_problems.%ToJSON()_
 				". Reply again with only the JSON object, using only permittedActions and evidenceCodesObserved."
 		}

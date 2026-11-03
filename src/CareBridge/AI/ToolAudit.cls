@@ -16,13 +16,30 @@ Method %LogExecution(call As %DynamicObject, metadata As %DynamicObject, result 
 		Set tc.DurationMs = duration
 		Set tc.Success = $$$ISOK(status)
 		If $$$ISOK(status) {
-			Set tc.ResultSummary = $EXTRACT($SELECT($ISOBJECT(result):result.%ToJSON(), 1:result), 1, 1000)
+			Set tc.ResultSummary = $EXTRACT(..Unwrap(result), 1, 1000)
 		} Else {
 			Set tc.Error = $EXTRACT($SYSTEM.Status.GetErrorText(status), 1, 2000)
 		}
 		Do tc.%Save()
 	} Catch {}
 	Quit $$$OK
+}
+
+/// AI Hub hands the audit policy {"tool_name":..., "result_json":"<JSON string>"}, and our tools themselves
+/// return JSON strings, so the useful result can be encoded twice. Unwrap to the tool's own JSON.
+ClassMethod Unwrap(result) As %String
+{
+	Set v = result
+	If $ISOBJECT(v) && v.%IsDefined("result_json") Set v = v."result_json"
+	For i = 1:1:3 {
+		Quit:$ISOBJECT(v)
+		// Wrapping in an array lets one parser handle objects, arrays and JSON-encoded strings alike.
+		Set parsed = ""
+		Try { Set parsed = [].%FromJSON("["_v_"]").%Get(0) } Catch {}
+		Quit:parsed=""
+		Set v = parsed
+	}
+	Quit $SELECT($ISOBJECT(v):v.%ToJSON(), 1:v)
 }
 
 }

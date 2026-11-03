@@ -76,7 +76,7 @@ ClassMethod Run(run As CareBridge.Data.AgentRun, input As %DynamicObject, scenar
 	Set all = ..Fixtures()
 	Set key = $SELECT((scenario '= "") && all.%IsDefined(scenario):scenario, 1:input.exceptionType)
 	Set fx = all.%Get(key)
-	Set out = {"outcome":"INVALID_OUTPUT", "recommendation":"", "rawOutput":"", "attempts":0, "problems":[], "provider":"replay", "model":("fixture:"_key)}
+	Set out = {"outcome":"INVALID_OUTPUT", "recommendation":"", "rawOutput":"", "attempts":0, "problems":[], "rejectedAttempts":[], "provider":"replay", "model":("fixture:"_key)}
 	If '$ISOBJECT(fx) {
 		Set out.outcome = "NOT_AVAILABLE", out.error = "No replay fixture for "_key
 		Quit out
@@ -112,6 +112,7 @@ ClassMethod Run(run As CareBridge.Data.AgentRun, input As %DynamicObject, scenar
 			Set out.outcome = "OK", out.recommendation = rec
 			Quit
 		}
+		Do out.rejectedAttempts.%Push({"attempt":(attempt), "output":($EXTRACT(text, 1, 300)), "problems":(problems)})
 	}
 	Quit out
 }

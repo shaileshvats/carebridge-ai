@@ -1,0 +1,84 @@
+1
+00:00:00,000 --> 00:00:08,000
+CareBridge AI: an InterSystems IRIS interoperability production with an AI Hub agent and a deterministic policy gate.
+
+2
+00:00:08,000 --> 00:00:20,000
+A lab result can be valid HL7 and still be unsafe to route. Today people investigate these exceptions by hand.
+
+3
+00:00:20,000 --> 00:00:37,000
+The LIS and HIS send HL7 over MLLP. On an exception the AI Hub agent investigates; the policy gate decides what the production may do.
+
+4
+00:00:37,000 --> 00:00:45,586
+The dashboard reads every number from IRIS. REPLAY mode: real production, tools and policy gate; only the agent reply is scripted.
+
+5
+00:00:45,586 --> 00:00:53,707
+A clean ORU^R01 arrives over MLLP. No exception, so no agent: it goes straight to the EMR.
+
+6
+00:00:53,707 --> 00:01:00,027
+Every message gets a correlation id, an immutable copy of the original and an audit timeline.
+
+7
+00:01:00,027 --> 00:01:07,989
+Switching to LIVE: the AI Hub agent calls a local Qwen3-4B model through the openai provider. No API cost.
+
+8
+00:01:07,989 --> 00:01:16,978
+Unknown order: the patient exists but the order number does not. The agent investigates.
+
+9
+00:01:16,978 --> 00:01:22,554
+The exception case: deterministic validation findings from the HIS registry.
+
+10
+00:01:22,554 --> 00:01:30,551
+The agent run: model, duration, tokens reported by AI Hub, and the read-only tool calls it made.
+
+11
+00:01:30,551 --> 00:01:39,306
+The policy gate checks the contract, the evidence, the action matrix, identity and retry rules before anything runs.
+
+12
+00:01:39,306 --> 00:01:50,269
+Back to REPLAY for an adversarial test: a scripted "model" proposes merging patient records, then accepting.
+
+13
+00:01:50,269 --> 00:01:57,481
+The contract validator rejects the merge and the extra patient_update field…
+
+14
+00:01:57,481 --> 00:02:06,332
+…and the policy gate rejects ACCEPT: not permitted for the agent, and patient identity is in conflict. A person decides.
+
+15
+00:02:06,332 --> 00:02:13,333
+Unknown patient: identity is never guessed. The case becomes an IRIS Workflow Engine task.
+
+16
+00:02:13,333 --> 00:02:25,636
+A reviewer tries to accept the result, with a note.
+
+17
+00:02:25,636 --> 00:02:36,946
+The policy gate refuses the human decision too: the patient is still not in the HIS registry. A new task is issued.
+
+18
+00:02:36,946 --> 00:02:43,386
+The HIS now sends the registration (ADT^A04 over MLLP)…
+
+19
+00:02:43,386 --> 00:03:04,301
+…and the same decision is approved by the policy gate and executed: the result is delivered to the EMR.
+
+20
+00:03:04,301 --> 00:03:13,960
+Agent activity: every run with its mode, model, duration, reported tokens, tool calls and policy verdict.
+
+21
+00:03:13,960 --> 00:03:24,960
+docker compose up · IPM package · 37 unit and 8 integration tests · synthetic data only.
+

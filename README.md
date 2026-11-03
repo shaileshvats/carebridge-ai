@@ -9,7 +9,13 @@ Connecting hospital systems. Investigating exceptions. Governing AI decisions.
 
 CareBridge AI is an InterSystems IRIS for Health interoperability production for the **InterSystems Programming Contest: AI Agents in Interoperability Workflows**. A laboratory system sends HL7 v2 results. IRIS validates each one, and when a result can't be routed safely, an **IRIS AI Hub agent** investigates the exception with read-only tools and recommends what to do. A **deterministic policy gate** decides whether that recommendation may run. The production then delivers the result, quarantines it, rejects it back to the lab, schedules a retry, or hands it to a person through the **Workflow Engine**. All data is synthetic.
 
-Built and tested on **AI Hub Early Access Community build 2027.1.0AI.109.0 (IRIS for Health), ARM64 and x64.**
+Built and tested on **AI Hub Early Access Community build 2027.1.0AI.109.0 (IRIS for Health)**, ARM64 (Apple M2). The x64 image has the same tag but was not tested here.
+
+**Demo video (3½ min, real application footage, synthetic-voice narration and captions):** [docs/demo/carebridge-demo.mp4](docs/demo/carebridge-demo.mp4) · [captions](docs/demo/carebridge-demo.srt)
+
+| The agent investigated with read-only tools (LIVE, local model) | The policy gate refused an unsafe recommendation |
+|---|---|
+| ![Agent run with tool calls](docs/screenshots/agent-tool-calls-live.jpg) | ![Policy gate rejecting ACCEPT](docs/screenshots/policy-gate-unsafe-action.jpg) |
 
 ---
 

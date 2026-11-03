@@ -12,7 +12,7 @@ Hospital lab-result interoperability where an IRIS AI Hub agent investigates HL7
 **Industry:** Healthcare
 **Tags:** AI, Interoperability, HL7, Healthcare, Workflow, Docker, IPM, Contest
 **Contest:** InterSystems Programming Contest: AI Agents in Interoperability Workflows
-**Build:** AI Hub Early Access Community 2027.1.0AI.109.0 (IRIS for Health), ARM64 and x64
+**Build:** AI Hub Early Access Community 2027.1.0AI.109.0 (IRIS for Health). Tested on ARM64 (Apple M2); the x64 image has the same tag but is untested
 **Publish in Package Manager:** yes (package name `carebridge-ai`)
 **Licence URL:** *(the LICENSE file once the owner approves one)*
 **Demo / video / article links:** *(add when published)*

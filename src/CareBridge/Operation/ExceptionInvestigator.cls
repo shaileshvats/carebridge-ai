@@ -59,7 +59,14 @@ Method Investigate(pRequest As CareBridge.Msg.InvestigationRequest, Output pResp
 	Set run.Attempts = result.attempts
 	Set run.Outcome = result.outcome
 	Set run.RawOutput = $EXTRACT(result.rawOutput, 1, 30000)
-	Set run.Error = $EXTRACT($SELECT(result.%IsDefined("error"):result.error, result.problems.%Size()>0:result.problems.%ToJSON(), 1:""), 1, 4000)
+	// Errors, or every reply the contract validator refused (with its reasons), so the trace shows retries.
+	Set err = $SELECT(result.%IsDefined("error"):result.error, 1:"")
+	If $ISOBJECT(result.rejectedAttempts) && (result.rejectedAttempts.%Size() > 0) {
+		Set err = err_$SELECT(err'="":" | ", 1:"")_"Rejected by contract validator: "
+		Set it = result.rejectedAttempts.%GetIterator()
+		While it.%GetNext(.k, .ra) { Set err = err_"attempt "_ra.attempt_" "_ra.problems.%ToJSON()_"; " }
+	}
+	Set run.Error = $EXTRACT(err, 1, 4000)
 	If result.%IsDefined("promptTokens") && (result.promptTokens '= "") Set run.PromptTokens = result.promptTokens
 	If result.%IsDefined("completionTokens") && (result.completionTokens '= "") Set run.CompletionTokens = result.completionTokens
 	If $ISOBJECT(result.recommendation) {
