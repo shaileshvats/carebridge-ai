@@ -42,6 +42,14 @@ ClassMethod Fail(httpStatus As %String, message As %String) As %Status
 	Quit ..Reply({"error":(message)})
 }
 
+/// Dynamic SQL that fails loudly: a query error becomes an HTTP 500 instead of an empty list.
+ClassMethod Q(sql As %String, args...) As %SQL.StatementResult
+{
+	Set rs = ##class(%SQL.Statement).%ExecDirect(, sql, args...)
+	If rs.%SQLCODE < 0 $$$ThrowStatus($$$ERROR($$$SQLError, rs.%SQLCODE, rs.%Message))
+	Quit rs
+}
+
 ClassMethod Body() As %DynamicObject
 {
 	Try {
@@ -85,7 +93,7 @@ ClassMethod Overview() As %Status
 	Set out.deliveredToEMR = +n
 	Set out.mode = ##class(CareBridge.Operation.ExceptionInvestigator).ActiveMode()
 	Set out.byException = []
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT ExceptionType, COUNT(*) AS N FROM CareBridge_Data.ExceptionCase GROUP BY ExceptionType ORDER BY N DESC")
+	Set rs = ..Q("SELECT ExceptionType, COUNT(*) AS N FROM CareBridge_Data.ExceptionCase GROUP BY ExceptionType ORDER BY N DESC")
 	While rs.%Next() { Do out.byException.%Push({"type":(rs.ExceptionType), "count":(rs.N)}) }
 	Quit ..Reply(out)
 }
@@ -107,8 +115,7 @@ ClassMethod Messages() As %Status
 	If from '= "" Set sql = sql_" AND ReceivedAt >= ?", args = args + 1, args(args) = from
 	If to '= "" Set sql = sql_" AND ReceivedAt <= ?", args = args + 1, args(args) = to_$SELECT($LENGTH(to)=10:" 23:59:59", 1:"")
 	Set sql = sql_" ORDER BY ID DESC"
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, sql, args...)
-	If rs.%SQLCODE < 0 Quit ..Fail("400", rs.%Message)
+	Set rs = ..Q(sql, args...)
 	Set out = []
 	While rs.%Next() {
 		Do out.%Push({"correlationId":(rs.CorrelationId), "controlId":(rs.ControlId), "messageType":(rs.MessageType), "patientRef":(rs.PatientRef), "orderRef":(rs.OrderRef), "resultStatus":(rs.ResultStatus), "status":(rs.Status), "finalOutcome":(rs.FinalOutcome), "decidedBy":(rs.DecidedBy), "deliveryAttempts":(rs.DeliveryAttempts), "scenario":(rs.Scenario), "receivedAt":(rs.ReceivedAt), "completedAt":(rs.CompletedAt)})
@@ -127,14 +134,14 @@ ClassMethod MessageDetail(corr As %String) As %Status
 		"deliveryAttempts":(r.DeliveryAttempts), "scenario":(r.Scenario), "receivedAt":(r.ReceivedAt), "completedAt":(r.CompletedAt), "sessionId":(r.SessionId),
 		"contentHash":(r.ContentHash), "raw":(raw), "parsed":(##class(CareBridge.Engine.HL7Parser).Parse(raw))}
 	Set out.cases = []
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT ID FROM CareBridge_Data.ExceptionCase WHERE CorrelationId = ? ORDER BY ID", corr)
+	Set rs = ..Q("SELECT ID FROM CareBridge_Data.ExceptionCase WHERE CorrelationId = ? ORDER BY ID", corr)
 	While rs.%Next() {
 		Set c = ##class(CareBridge.Data.ExceptionCase).%OpenId(rs.ID)
 		Set co = {"caseId":(c.%Id()), "exceptionType":(c.ExceptionType), "status":(c.Status), "resolution":(c.Resolution), "resolvedBy":(c.ResolvedBy), "reviewNote":(c.ReviewNote), "createdAt":(c.CreatedAt), "resolvedAt":(c.ResolvedAt),
 			"findings":([].%FromJSON(c.Findings)), "context":($SELECT(c.Context'="":{}.%FromJSON(c.Context), 1:{})), "agentRuns":[], "policy":[]}
-		Set rs2 = ##class(%SQL.Statement).%ExecDirect(, "SELECT ID FROM CareBridge_Data.AgentRun WHERE ExceptionCase = ? ORDER BY ID", c.%Id())
+		Set rs2 = ..Q("SELECT ID FROM CareBridge_Data.AgentRun WHERE ExceptionCase = ? ORDER BY ID", c.%Id())
 		While rs2.%Next() { Do co.agentRuns.%Push(..RunJSON(rs2.ID)) }
-		Set rs3 = ##class(%SQL.Statement).%ExecDirect(, "SELECT ID, Source, RecommendedAction, Approved, FinalAction, Rules, Summary, EvaluatedAt FROM CareBridge_Data.PolicyEvaluation WHERE ExceptionCase = ? ORDER BY ID", c.%Id())
+		Set rs3 = ..Q("SELECT ID, Source, RecommendedAction, Approved, FinalAction, Rules, Summary, EvaluatedAt FROM CareBridge_Data.PolicyEvaluation WHERE ExceptionCase = ? ORDER BY ID", c.%Id())
 		While rs3.%Next() {
 			Set pe = {"id":(rs3.ID), "source":(rs3.Source), "recommendedAction":(rs3.RecommendedAction), "finalAction":(rs3.FinalAction), "summary":(rs3.Summary), "evaluatedAt":(rs3.EvaluatedAt), "rules":([].%FromJSON(rs3.Rules))}
 			Do pe.%Set("approved", rs3.Approved, "boolean")
@@ -143,10 +150,10 @@ ClassMethod MessageDetail(corr As %String) As %Status
 		Do out.cases.%Push(co)
 	}
 	Set out.timeline = []
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT EventType, Actor, Detail, At FROM CareBridge_Data.AuditEvent WHERE CorrelationId = ? ORDER BY ID", corr)
+	Set rs = ..Q("SELECT EventType, Actor, Detail, ""At"" FROM CareBridge_Data.AuditEvent WHERE CorrelationId = ? ORDER BY ID", corr)
 	While rs.%Next() { Do out.timeline.%Push({"event":(rs.EventType), "actor":(rs.Actor), "detail":(rs.Detail), "at":(rs.At)}) }
 	Set out.queueItems = []
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT ID, Queue, Status, Reason, DueAt, CreatedAt, ClosedAt FROM CareBridge_Data.QueueItem WHERE CorrelationId = ? ORDER BY ID", corr)
+	Set rs = ..Q("SELECT ID, Queue, Status, Reason, DueAt, CreatedAt, ClosedAt FROM CareBridge_Data.QueueItem WHERE CorrelationId = ? ORDER BY ID", corr)
 	While rs.%Next() { Do out.queueItems.%Push({"id":(rs.ID), "queue":(rs.Queue), "status":(rs.Status), "reason":(rs.Reason), "dueAt":(rs.DueAt), "createdAt":(rs.CreatedAt), "closedAt":(rs.ClosedAt)}) }
 	Set d = ##class(CareBridge.Data.DeliveredResult).CorrelationIdxOpen(corr)
 	Set out.delivery = $SELECT($ISOBJECT(d):{"receiverRef":(d.%Id()), "deliveredAt":(d.DeliveredAt)}, 1:"")
@@ -160,9 +167,9 @@ ClassMethod RunJSON(id As %String) As %DynamicObject
 		"startedAt":(a.StartedAt), "endedAt":(a.EndedAt), "durationMs":(a.DurationMs), "promptTokens":(a.PromptTokens), "completionTokens":(a.CompletionTokens), "attempts":(a.Attempts),
 		"outcome":(a.Outcome), "recommendedAction":(a.RecommendedAction), "error":(a.Error), "rawOutput":(a.RawOutput),
 		"input":($SELECT(a.InputPayload'="":{}.%FromJSON(a.InputPayload), 1:"")), "recommendation":($SELECT(a.Recommendation'="":{}.%FromJSON(a.Recommendation), 1:"")), "toolCalls":[]}
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT Seq, ToolName, Arguments, ResultSummary, DurationMs, Success, Error, Authorization, CalledAt FROM CareBridge_Data.ToolCall WHERE AgentRun = ? ORDER BY Seq", id)
+	Set rs = ..Q("SELECT Seq, ToolName, Arguments, ResultSummary, DurationMs, Success, Error, ""Authorization"" AS Auth, CalledAt FROM CareBridge_Data.ToolCall WHERE AgentRun = ? ORDER BY Seq", id)
 	While rs.%Next() {
-		Set t = {"seq":(rs.Seq), "tool":(rs.ToolName), "arguments":(rs.Arguments), "result":(rs.ResultSummary), "durationMs":(rs.DurationMs), "error":(rs.Error), "authorization":(rs.Authorization), "calledAt":(rs.CalledAt)}
+		Set t = {"seq":(rs.Seq), "tool":(rs.ToolName), "arguments":(rs.Arguments), "result":(rs.ResultSummary), "durationMs":(rs.DurationMs), "error":(rs.Error), "authorization":(rs.Auth), "calledAt":(rs.CalledAt)}
 		Do t.%Set("success", rs.Success, "boolean")
 		Do o.toolCalls.%Push(t)
 	}
@@ -180,7 +187,7 @@ ClassMethod AgentRuns() As %Status
 {
 	Set limit = $SELECT(+$GET(%request.Data("limit", 1)) > 0:+%request.Data("limit", 1), 1:100)
 	Set out = []
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT TOP ? ID FROM CareBridge_Data.AgentRun ORDER BY ID DESC", limit)
+	Set rs = ..Q("SELECT TOP ? ID FROM CareBridge_Data.AgentRun ORDER BY ID DESC", limit)
 	While rs.%Next() {
 		Set o = ..RunJSON(rs.ID)
 		Do o.%Remove("input"), o.%Remove("rawOutput")
@@ -205,7 +212,7 @@ ClassMethod ReviewDecide(caseId As %String) As %Status
 ClassMethod Queues() As %Status
 {
 	Set out = []
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT TOP 200 ID, Queue, CorrelationId, ExceptionCase, Status, Reason, DueAt, CreatedAt, ClosedAt FROM CareBridge_Data.QueueItem ORDER BY ID DESC")
+	Set rs = ..Q("SELECT TOP 200 ID, Queue, CorrelationId, ExceptionCase, Status, Reason, DueAt, CreatedAt, ClosedAt FROM CareBridge_Data.QueueItem ORDER BY ID DESC")
 	While rs.%Next() { Do out.%Push({"id":(rs.ID), "queue":(rs.Queue), "correlationId":(rs.CorrelationId), "caseId":(rs.ExceptionCase), "status":(rs.Status), "reason":(rs.Reason), "dueAt":(rs.DueAt), "createdAt":(rs.CreatedAt), "closedAt":(rs.ClosedAt)}) }
 	Quit ..Reply(out)
 }

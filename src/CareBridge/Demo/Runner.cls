@@ -37,7 +37,16 @@ ClassMethod RunScenario(name As %String, timeoutSeconds As %Integer = 0) As %Dyn
 	Set last = out.messages.%Get(out.messages.%Size() - 1)
 	Set outcome = $SELECT($ISOBJECT(last)&&$ISOBJECT(last.final):last.final.outcome, 1:"")
 	Set out.outcome = outcome
-	Do out.%Set("passed", (outcome = sc.expect), "boolean")
+	// REPLAY is deterministic, so the exact recorded outcome is required. A LIVE model may choose any
+	// action the policy allows; the scenario then passes if the outcome is one of its safe outcomes.
+	Set mode = ##class(CareBridge.Operation.ExceptionInvestigator).ActiveMode()
+	Set out.mode = mode
+	Set ok = (outcome = sc.expect)
+	If 'ok && (mode = "LIVE") && $ISOBJECT(sc.safeOutcomes) {
+		Set it = sc.safeOutcomes.%GetIterator()
+		While it.%GetNext(.k, .o) { Set:o=outcome ok = 1 }
+	}
+	Do out.%Set("passed", ok, "boolean")
 	Set out.finishedAt = $ZDATETIME($ZTIMESTAMP, 3)
 	Quit out
 }

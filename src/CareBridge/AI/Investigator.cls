@@ -16,7 +16,8 @@ ClassMethod Run(run As CareBridge.Data.AgentRun, input As %DynamicObject) As %Dy
 		$$$ThrowOnError(agent.%Init())
 		Do agent.ToolManager.SetAuditPolicy(##class(CareBridge.AI.ToolAudit).%New())
 		Do agent.ToolManager.SetAuthPolicy(##class(CareBridge.AI.ToolGuard).%New())
-		Set sessionCfg = {"max_iterations":8, "max_tokens":700}
+		Set maxTokens = +##class(CareBridge.ExceptionInvestigator).Setting("LLMMaxTokens", "CAREBRIDGE_LLM_MAX_TOKENS", 700)
+		Set sessionCfg = {"max_iterations":8, "max_tokens":(maxTokens)}
 		Set temp = ##class(CareBridge.ExceptionInvestigator).Setting("LLMTemperature", "CAREBRIDGE_LLM_TEMPERATURE", "")
 		If temp '= "" Do sessionCfg.%Set("temperature", +temp, "number")
 		Set session = agent.CreateSession(sessionCfg)
