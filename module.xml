@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Export generator="Cache" version="25">
+  <Document name="carebridge-ai.ZPM">
+    <Module>
+      <Name>carebridge-ai</Name>
+      <Version>1.0.0</Version>
+      <Description>CareBridge AI: hospital lab-result interoperability where an IRIS AI Hub agent investigates exceptions and a deterministic policy gate governs every action. Synthetic data only.</Description>
+      <Keywords>interoperability hl7 ai-hub agent healthcare workflow policy</Keywords>
+      <Author>
+        <Person>Shailesh Vats</Person>
+      </Author>
+      <Packaging>module</Packaging>
+      <SystemRequirements Version="&gt;=2026.3" Interoperability="enabled"/>
+      <SourcesRoot>src</SourcesRoot>
+      <Resource Name="CareBridge.PKG"/>
+      <CSPApplication
+        Url="/carebridge"
+        SourcePath="/web"
+        DeployPath="${cspdir}carebridge"
+        ServeFiles="1"
+        Recurse="1"
+        CookiePath="/carebridge/"
+        PasswordAuthEnabled="0"
+        UnauthenticatedEnabled="1"
+        MatchRoles=":${dbrole}"
+      />
+      <CSPApplication
+        Url="/api/carebridge"
+        DispatchClass="CareBridge.API.REST"
+        CookiePath="/api/carebridge/"
+        PasswordAuthEnabled="0"
+        UnauthenticatedEnabled="1"
+        MatchRoles=":${dbrole}"
+      />
+      <Invoke Class="CareBridge.Setup.Installer" Method="Install" Phase="Activate" When="After"/>
+    </Module>
+  </Document>
+</Export>

@@ -1,0 +1,5 @@
+[Actions]
+ModifyService:Name=%Service_CallIn,Enabled=1,AutheEnabled=48
+CreateResource:Name=%DB_CAREBRIDGE,Description="CareBridge AI database"
+CreateDatabase:Name=CAREBRIDGE,Directory=/home/irisowner/carebridge/db,Resource=%DB_CAREBRIDGE
+CreateNamespace:Name=CAREBRIDGE,Globals=CAREBRIDGE,Routines=CAREBRIDGE,Interop=1

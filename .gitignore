@@ -1,0 +1,14 @@
+# Secrets and local configuration
+.env
+*.key
+
+# InterSystems EAP images and kits must never be committed or redistributed
+*.tar.gz
+*.tar
+
+# Local output
+logs/
+*.log
+tests/reports/*.local.*
+.DS_Store
+node_modules/

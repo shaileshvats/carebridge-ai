@@ -1,0 +1,6 @@
+.git
+.env
+*.tar.gz
+docs/
+tests/
+scripts/
