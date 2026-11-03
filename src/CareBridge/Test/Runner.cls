@@ -8,6 +8,8 @@ Parameter UNIT = "CareBridge.Test.HL7Parser,CareBridge.Test.Recommendation,CareB
 
 ClassMethod Run(includeIntegration As %Boolean = 0, reportFile As %String = "") As %DynamicObject
 {
+	// %UnitTest resolves a root directory even when nothing is loaded from disk.
+	If ($GET(^UnitTestRoot) = "") || '##class(%File).DirectoryExists(^UnitTestRoot) Set ^UnitTestRoot = $SYSTEM.Util.ManagerDirectory()
 	Set classes = ..#UNIT_$SELECT(includeIntegration:",CareBridge.Test.Integration", 1:"")
 	Set report = {"startedAt":($ZDATETIME($ZTIMESTAMP, 3)), "iris":($ZVERSION), "agentMode":(##class(CareBridge.Operation.ExceptionInvestigator).ActiveMode()), "tests":[], "passed":0, "failed":0}
 	For i = 1:1:$LENGTH(classes, ",") {

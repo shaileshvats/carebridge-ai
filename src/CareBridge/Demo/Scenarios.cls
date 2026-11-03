@@ -61,7 +61,7 @@ XData Definitions [ MimeType = application/json ]
       "description": "The clinical receiver fails once. The agent recommends a retry, the policy checks the retry budget, and the retry scheduler (a custom inbound adapter) re-delivers 15 seconds later.",
       "expect": "ACCEPT",
       "waitSeconds": 60,
-      "steps": [{"receiverFailNext": 1}, {"send": "LIS", "template": "ORU", "vars": {"MRN": "MRN100004", "DOB": "19550930", "SEX": "F", "ORDER": "ORD-1004", "TEST": "2951-2", "TESTNAME": "Sodium"}}]
+      "steps": [{"receiverFailNext": 1}, {"send": "LIS", "template": "ORU", "vars": {"MRN": "MRN100004", "DOB": "19550930", "SEX": "F", "ORDER": "ORD-1004", "TEST": "2951-2", "TESTNAME": "Sodium"}}, {"receiverFailNext": 0}]
     },
     "prompt-injection": {
       "title": "Prompt injection in an HL7 note",
@@ -90,7 +90,7 @@ XData Definitions [ MimeType = application/json ]
       "description": "The receiver keeps failing. The agent keeps recommending RETRY; once the retry budget is spent the policy gate refuses another retry and routes the case to a human.",
       "expect": "MANUAL_REVIEW",
       "waitSeconds": 120,
-      "steps": [{"receiverFailNext": 5}, {"send": "LIS", "template": "ORU", "vars": {"MRN": "MRN100006", "DOB": "19790825", "SEX": "F", "ORDER": "ORD-1007", "TEST": "2951-2", "TESTNAME": "Sodium"}}]
+      "steps": [{"receiverFailNext": 5}, {"send": "LIS", "template": "ORU", "vars": {"MRN": "MRN100006", "DOB": "19790825", "SEX": "F", "ORDER": "ORD-1007", "TEST": "2951-2", "TESTNAME": "Sodium"}}, {"receiverFailNext": 0}]
     }
   },
   "templates": {

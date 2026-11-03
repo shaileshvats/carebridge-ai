@@ -13,24 +13,22 @@
       <SystemRequirements Version="&gt;=2026.3" Interoperability="enabled"/>
       <SourcesRoot>src</SourcesRoot>
       <Resource Name="CareBridge.PKG"/>
-      <CSPApplication
+      <FileCopy Name="web/" Target="${cspdir}carebridge/"/>
+      <WebApplication
         Url="/carebridge"
-        SourcePath="/web"
-        DeployPath="${cspdir}carebridge"
+        Path="${cspdir}carebridge"
         ServeFiles="1"
         Recurse="1"
         CookiePath="/carebridge/"
-        PasswordAuthEnabled="0"
-        UnauthenticatedEnabled="1"
-        MatchRoles=":${dbrole}"
+        AutheEnabled="64"
+        MatchRoles=":{$globalsDbRole}"
       />
-      <CSPApplication
+      <WebApplication
         Url="/api/carebridge"
         DispatchClass="CareBridge.API.REST"
         CookiePath="/api/carebridge/"
-        PasswordAuthEnabled="0"
-        UnauthenticatedEnabled="1"
-        MatchRoles=":${dbrole}"
+        AutheEnabled="64"
+        MatchRoles=":{$globalsDbRole}"
       />
       <Invoke Class="CareBridge.Setup.Installer" Method="Install" Phase="Activate" When="After"/>
     </Module>

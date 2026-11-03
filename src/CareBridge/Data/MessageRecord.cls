@@ -6,8 +6,9 @@ Class CareBridge.Data.MessageRecord Extends (%Persistent, %JSON.Adaptor)
 /// Correlation id that follows this message through every table and the Interoperability message trace.
 Property CorrelationId As %String(MAXLEN = 40) [ Required ];
 
-/// Sending application + facility + control id (MSH-3/4/10). Unique: a resend of the same control id
-/// is recognised as a duplicate transmission before anything else happens.
+/// Sending application + facility + control id (MSH-3/4/10). Not unique: a resend of the same control id
+/// is stored as its own record and recognised by validation as a duplicate transmission. Duplicate side
+/// effects are prevented downstream by the unique indexes on CareBridge.Data.DeliveredResult.
 Property IdempotencyKey As %String(MAXLEN = 200) [ Required ];
 
 /// SHA-256 of the clinically relevant content (patient, order, observations). Used to detect the same
@@ -33,6 +34,9 @@ Property ResultStatus As %String(MAXLEN = 4);
 /// Original message text exactly as received. Immutable.
 Property RawMessage As %Stream.GlobalCharacter;
 
+/// SHA-256 of RawMessage, fixed on first save; any later save with different content is refused.
+Property RawSHA256 As %String(MAXLEN = 64);
+
 /// RECEIVED, VALIDATING, INVESTIGATING, ACCEPTED, RETRY_PENDING, QUARANTINED, MANUAL_REVIEW, DUPLICATE_SUPPRESSED, REJECTED, FAILED
 Property Status As %String(MAXLEN = 24) [ InitialExpression = "RECEIVED" ];
 
@@ -57,7 +61,7 @@ Property ReceivedAt As %TimeStamp [ InitialExpression = {$ZDATETIME($ZTIMESTAMP,
 
 Property CompletedAt As %TimeStamp;
 
-Index IdempotencyIdx On IdempotencyKey [ Unique ];
+Index IdempotencyIdx On IdempotencyKey;
 
 Index CorrelationIdx On CorrelationId [ Unique ];
 
@@ -74,10 +78,18 @@ Index ReceivedIdx On ReceivedAt;
 /// Refuse to save a changed RawMessage once the record exists.
 Method %OnBeforeSave(insert As %Boolean) As %Status [ Private, ServerOnly = 1 ]
 {
-	If 'insert && ..RawMessageIsModified() {
-		Quit $$$ERROR($$$GeneralError, "CareBridge: the original message is immutable")
+	Set hash = ..RawHash()
+	If insert || (..RawSHA256 = "") {
+		Set ..RawSHA256 = hash
+		Quit $$$OK
 	}
+	If hash '= ..RawSHA256 Quit $$$ERROR($$$GeneralError, "CareBridge: the original message is immutable")
 	Quit $$$OK
+}
+
+Method RawHash() As %String [ Private ]
+{
+	Quit $ZCONVERT(##class(%xsd.hexBinary).LogicalToXSD($SYSTEM.Encryption.SHAHash(256, $ZCONVERT(..RawText(), "O", "UTF8"))), "L")
 }
 
 ClassMethod OpenByCorrelation(correlationId As %String) As CareBridge.Data.MessageRecord

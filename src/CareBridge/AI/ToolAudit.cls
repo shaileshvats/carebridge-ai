@@ -3,7 +3,7 @@
 Class CareBridge.AI.ToolAudit Extends %AI.Policy.Audit
 {
 
-Method %LogExecution(call As %DynamicObject, metadata As %DynamicObject, result As %DynamicObject, duration As %Integer, status As %Status)
+Method %LogExecution(call As %DynamicObject, metadata As %DynamicObject, result As %DynamicObject, duration As %Integer, status As %Status) As %Status
 {
 	Try {
 		Set runId = $GET(^||CareBridge.AgentRunId)
@@ -22,6 +22,7 @@ Method %LogExecution(call As %DynamicObject, metadata As %DynamicObject, result 
 		}
 		Do tc.%Save()
 	} Catch {}
+	Quit $$$OK
 }
 
 }

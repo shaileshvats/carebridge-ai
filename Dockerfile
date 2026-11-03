@@ -13,6 +13,11 @@ COPY --chown=irisowner:irisowner module.xml merge.cpf iris.script ./
 COPY --chown=irisowner:irisowner src ./src
 COPY --chown=irisowner:irisowner web ./web
 
+# iris.script (terminal commands, no comments allowed):
+#  1. maps IPM, which IRIS for Health AI Hub images ship in HSLIB, into every namespace;
+#  2. un-expires default passwords (development container only; do not do this in production);
+#  3. installs CareBridge with "zpm load", exactly as an IPM user would: compile, web apps, seed data,
+#     Workflow role, web security role, production autostart. A failed install fails the build.
 RUN iris start IRIS \
  && iris merge IRIS /home/irisowner/dev/merge.cpf \
  && iris session IRIS < /home/irisowner/dev/iris.script \

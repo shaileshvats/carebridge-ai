@@ -116,8 +116,11 @@ Method TestHumanReviewAfterLateRegistration()
 	// Before registration, a human ACCEPT is refused by policy and a new task is issued.
 	Set res = ##class(CareBridge.Engine.Review).Decide(c.%Id(), "ACCEPT", "Patient confirmed at the ward", "reviewer.demo")
 	Do $$$AssertNotTrue(res.%IsDefined("error"), $SELECT(res.%IsDefined("error"):res.error, 1:""))
-	Do ..WaitFor(corr, "MANUAL_REVIEW", 2)
-	Do $$$AssertEquals(..Count("SELECT COUNT(*) FROM CareBridge_Data.PolicyEvaluation WHERE CorrelationId = ? AND Source = 'HUMAN' AND Approved = 0", corr), 1)
+	// The router handles the decision asynchronously (Workflow response), then issues a fresh task.
+	Do $$$AssertEquals(..WaitForCount("SELECT COUNT(*) FROM CareBridge_Data.PolicyEvaluation WHERE CorrelationId = ? AND Source = 'HUMAN' AND Approved = 0", corr, 1, 20), 1, "Refused by the policy gate")
+	Set deadline = $ZHOROLOG + 20
+	While '$ISOBJECT(##class(CareBridge.Engine.Review).FindTask(c.%Id())) && ($ZHOROLOG < deadline) { Hang 0.5 }
+	Do $$$AssertTrue($ISOBJECT(##class(CareBridge.Engine.Review).FindTask(c.%Id())), "A new review task was issued")
 	// The HIS registers the patient; the same decision is now allowed.
 	Do ##class(CareBridge.Demo.Runner).RunFollowUp("unknown-patient")
 	Set res = ##class(CareBridge.Engine.Review).Decide(c.%Id(), "ACCEPT", "Registration now complete in HIS", "lab.supervisor")
@@ -125,6 +128,17 @@ Method TestHumanReviewAfterLateRegistration()
 	Set final = ..WaitFor(corr, "ACCEPTED", 20)
 	Do $$$AssertEquals(final, "ACCEPTED")
 	Do $$$AssertEquals(##class(CareBridge.Data.MessageRecord).OpenByCorrelation(corr).DecidedBy, "HUMAN")
+}
+
+Method WaitForCount(sql As %String, arg As %String, n As %Integer, seconds As %Integer) As %Integer
+{
+	Set deadline = $ZHOROLOG + seconds
+	For {
+		Set c = ..Count(sql, arg)
+		Quit:(c>=n)||($ZHOROLOG>deadline)
+		Hang 0.5
+	}
+	Quit c
 }
 
 Method WaitFor(corr As %String, status As %String, seconds As %Integer) As %String

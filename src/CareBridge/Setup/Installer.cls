@@ -16,6 +16,7 @@ ClassMethod Install() As %Status
 		Do ..ConfigDefaults()
 		$$$ThrowOnError(..Seed())
 		$$$ThrowOnError(..SetupWorkflow())
+		$$$ThrowOnError(..ConfigureWebSecurity())
 		$$$ThrowOnError(##class(Ens.Director).SetAutoStart("CareBridge.Production", 0))
 		Write "CareBridge installed in namespace ", $NAMESPACE, !
 	} Catch ex {
@@ -89,7 +90,7 @@ ClassMethod SetupWorkflow() As %Status
 {
 	Set role = ..#REVIEWROLE
 	If '##class(EnsLib.Workflow.RoleDefinition).%ExistsId(role) {
-		Set sc = ##class(EnsLib.Workflow.RoleDefinition).CreateRole(role, "Reviews CareBridge exception cases")
+		Set sc = ##class(EnsLib.Workflow.RoleDefinition).CreateRole(role)
 		Return:$$$ISERR(sc) sc
 	}
 	For i = 1:1:$LENGTH(..#REVIEWERS, ",") {
@@ -105,6 +106,39 @@ ClassMethod SetupWorkflow() As %Status
 	Quit $$$OK
 }
 
+/// Role added to the dashboard and API web applications: read access to the CareBridge tables and
+/// the Workflow task table through SQL. Writes happen only through CareBridge classes.
+Parameter WEBROLE = "CareBridgeWeb";
+
+ClassMethod ConfigureWebSecurity() As %Status
+{
+	Set sc = $$$OK, ns = $NAMESPACE, role = ..#WEBROLE
+	Try {
+		New $NAMESPACE
+		Set $NAMESPACE = "%SYS"
+		If '##class(Security.Roles).Exists(role) {
+			$$$ThrowOnError(##class(Security.Roles).Create(role, "CareBridge AI dashboard and API (synthetic demo data)", ""))
+		}
+		For app = "/carebridge", "/api/carebridge" {
+			Continue:'##class(Security.Applications).Exists(app)
+			Kill props
+			$$$ThrowOnError(##class(Security.Applications).Get(app, .props))
+			If (":"_props("MatchRoles")_":") '[ (":"_role_":") {
+				Set props("MatchRoles") = props("MatchRoles")_":"_role
+				$$$ThrowOnError(##class(Security.Applications).Modify(app, .props))
+			}
+		}
+		Set $NAMESPACE = ns
+		For grant = "GRANT SELECT ON SCHEMA CareBridge_Data TO "_role, "GRANT SELECT ON EnsLib_Workflow.TaskResponse TO "_role {
+			Set rs = ##class(%SQL.Statement).%ExecDirect(, grant)
+			If rs.%SQLCODE < 0 $$$ThrowStatus($$$ERROR($$$GeneralError, grant_": "_rs.%Message))
+		}
+	} Catch ex {
+		Set sc = ex.AsStatus()
+	}
+	Quit sc
+}
+
 /// Delete all transactional data (messages, cases, runs, audit, queues, deliveries, open workflow tasks)
 /// and restore the synthetic registry. The production keeps running.
 ClassMethod Reset() As %Status
@@ -115,7 +149,7 @@ ClassMethod Reset() As %Status
 		Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT ID FROM EnsLib_Workflow.TaskResponse WHERE TaskStatus_IsComplete = 0")
 		While rs.%Next() {
 			Set t = ##class(EnsLib.Workflow.TaskResponse).%OpenId(rs.%Get("ID"))
-			If $ISOBJECT(t) Do ##class(EnsLib.Workflow.Engine).CancelRequest(t.%TaskStatus.Request)
+			If $ISOBJECT(t) Do ##class(EnsLib.Workflow.Engine).%CancelRequest(t.%TaskStatus.Request)
 		}
 		Set ^CareBridge.ReceiverFailNext = 0
 		For cls = "ToolCall","PolicyEvaluation","AgentRun","QueueItem","ExceptionCase","DeliveredResult","MessageRecord","Patient","LabOrder" {

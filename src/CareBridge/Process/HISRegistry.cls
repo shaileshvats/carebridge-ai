@@ -7,7 +7,7 @@ Method OnRequest(pRequest As EnsLib.HL7.Message, Output pResponse As %Library.Pe
 {
 	Set sc = $$$OK
 	Try {
-		Set text = pRequest.OutputToString($CHAR(13), , .sc)
+		Set text = pRequest.OutputToString(, , .sc)
 		Quit:$$$ISERR(sc)
 		Set p = ##class(CareBridge.Engine.HL7Parser).Parse(text)
 		Set corr = "HIS-"_p.msh.controlId

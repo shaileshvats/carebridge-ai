@@ -8,7 +8,7 @@ Class CareBridge.Engine.Review Extends %RegisteredObject
 ClassMethod OpenTasks() As %DynamicArray
 {
 	Set out = []
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT ID FROM EnsLib_Workflow.TaskResponse WHERE TaskStatus_IsComplete = 0 AND TaskStatus_Role = ? ORDER BY ID DESC", ##class(CareBridge.Setup.Installer).#REVIEWROLE)
+	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT ID FROM EnsLib_Workflow.TaskResponse WHERE TaskStatus_IsComplete = 0 AND TaskStatus_RoleName = ? ORDER BY ID DESC", ##class(CareBridge.Setup.Installer).#REVIEWROLE)
 	While rs.%Next() {
 		Set t = ##class(EnsLib.Workflow.TaskResponse).%OpenId(rs.ID)
 		Continue:'$ISOBJECT(t)
@@ -36,7 +36,7 @@ ClassMethod CaseIdFromTask(t As EnsLib.Workflow.TaskResponse) As %String
 
 ClassMethod FindTask(caseId As %String) As EnsLib.Workflow.TaskResponse
 {
-	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT ID FROM EnsLib_Workflow.TaskResponse WHERE TaskStatus_IsComplete = 0 AND TaskStatus_Role = ? ORDER BY ID DESC", ##class(CareBridge.Setup.Installer).#REVIEWROLE)
+	Set rs = ##class(%SQL.Statement).%ExecDirect(, "SELECT ID FROM EnsLib_Workflow.TaskResponse WHERE TaskStatus_IsComplete = 0 AND TaskStatus_RoleName = ? ORDER BY ID DESC", ##class(CareBridge.Setup.Installer).#REVIEWROLE)
 	While rs.%Next() {
 		Set t = ##class(EnsLib.Workflow.TaskResponse).%OpenId(rs.ID)
 		If $ISOBJECT(t) && (..CaseIdFromTask(t) = caseId) Return t
@@ -51,8 +51,12 @@ ClassMethod Decide(caseId As %String, action As %String, note As %String, review
 	Set action = $ZCONVERT($GET(action), "U"), note = $GET(note), reviewer = $GET(reviewer)
 	If '##class(EnsLib.Workflow.UserDefinition).%ExistsId(reviewer) Quit {"error":"Unknown reviewer"}
 	Set t = ..FindTask(caseId)
-	If '$ISOBJECT(t) Quit {"error":"No open review task for case "_caseId}
-	If '$LISTFIND($LISTFROMSTRING(t.%Actions), action) Quit {"error":"Action "_action_" is not offered for this case"}
+	If '$ISOBJECT(t) Quit {"error":("No open review task for case "_caseId)}
+	If '$LISTFIND($LISTFROMSTRING(t.%Actions), action) Quit {"error":("Action "_action_" is not offered for this case")}
+	// Give the reviewer ownership of the task (Workflow Engine), then record the note and complete it.
+	Set sc = ##class(EnsLib.Workflow.Engine).AssignTask(t, reviewer)
+	If $$$ISERR(sc) Quit {"error":($SYSTEM.Status.GetErrorText(sc))}
+	Set t = ##class(EnsLib.Workflow.TaskResponse).%OpenId(t.%Id(), , .sc)
 	Set t.%UserName = reviewer
 	Do t.%FormValues.SetAt(note, "Note")
 	Set sc = t.%Save()

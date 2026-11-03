@@ -49,7 +49,7 @@ Method OnRequest(pRequest As %Library.Persistent, Output pResponse As %Library.P
 
 Method HandleResult(msg As EnsLib.HL7.Message) As %Status
 {
-	Set text = msg.OutputToString($CHAR(13), , .sc)
+	Set text = msg.OutputToString(, , .sc)
 	Quit:$$$ISERR(sc) sc
 	Set record = ##class(CareBridge.Engine.Intake).Register(text, ..%SessionId, msg.%Id(), .sc)
 	Quit:$$$ISERR(sc) sc

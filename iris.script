@@ -1,17 +1,7 @@
-    zn "%SYS"
-    // Development container convenience: default passwords do not expire. Do not do this in production.
-    do ##class(Security.Users).UnExpireUserPasswords("*")
-
-    // Install the ObjectScript Package Manager if this image does not already include it.
-    if '##class(%Dictionary.CompiledClass).%ExistsId("%IPM.Main") && '##class(%Dictionary.CompiledClass).%ExistsId("%ZPM.PackageManager") {
-        set r = ##class(%Net.HttpRequest).%New()
-        set r.Server = "pm.community.intersystems.com"
-        set r.SSLConfiguration = "ISC.FeatureTracker.SSL.Config"
-        do r.Get("/packages/zpm/latest/installer")
-        do $system.OBJ.LoadStream(r.HttpResponse.Data, "c")
-    }
-
-    zn "CAREBRIDGE"
-    // Install CareBridge exactly as an IPM user would: compile, web apps, seed data, workflow role.
-    zpm "load /home/irisowner/dev/ -v":1:1
-    halt
+zn "HSLIB"
+do ##class(%IPM.Main).Shell("enable -map -globally",1)
+zn "%SYS"
+do ##class(Security.Users).UnExpireUserPasswords("*")
+zn "CAREBRIDGE"
+do ##class(%IPM.Main).Shell("load /home/irisowner/dev/ -v",1,1)
+halt

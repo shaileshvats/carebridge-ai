@@ -12,12 +12,14 @@ XData ProductionDefinition
   <ActorPoolSize>2</ActorPoolSize>
   <Item Name="HIS.ADT.In" Category="HIS" ClassName="EnsLib.HL7.Service.TCPService" PoolSize="1" Enabled="true" Foreground="false" Comment="Simulated Hospital Information System: patient registration (ADT) and orders (ORM)">
     <Setting Target="Adapter" Name="Port">7010</Setting>
+    <Setting Target="Adapter" Name="StayConnected">30</Setting>
     <Setting Target="Host" Name="MessageSchemaCategory">2.5.1</Setting>
     <Setting Target="Host" Name="TargetConfigNames">CareBridge.HISRegistry</Setting>
     <Setting Target="Host" Name="AckMode">Immed</Setting>
   </Item>
   <Item Name="LIS.ORU.In" Category="LIS" ClassName="EnsLib.HL7.Service.TCPService" PoolSize="1" Enabled="true" Foreground="false" Comment="Simulated Laboratory Information System: results (ORU^R01)">
     <Setting Target="Adapter" Name="Port">7011</Setting>
+    <Setting Target="Adapter" Name="StayConnected">30</Setting>
     <Setting Target="Host" Name="MessageSchemaCategory">2.5.1</Setting>
     <Setting Target="Host" Name="TargetConfigNames">CareBridge.LabResultRouter</Setting>
     <Setting Target="Host" Name="AckMode">Immed</Setting>
