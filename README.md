@@ -136,7 +136,7 @@ zpm "install carebridge-ai"     // once the package is published on the communit
 do ##class(CareBridge.Setup.Installer).StartProduction()
 ```
 
-The manifest declares `<SystemRequirements Version="&gt;=2026.3" Interoperability="enabled"/>`. The Docker build installs from this repository with `zpm "load"`.
+The manifest declares `<SystemRequirements Version="&gt;=2026.3" Interoperability="enabled"/>`. `scripts/ipm-check.sh` installs the module into a bare AI Hub container with no CareBridge build. On build 109, IPM 0.10.10 refused it in a namespace without interoperability, and in an interoperability namespace it compiled, started the production and routed messages ([evidence](docs/evidence/)). The Docker build installs from this repository the same way, with `zpm "load"`.
 
 ## Code map
 
