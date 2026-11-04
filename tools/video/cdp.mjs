@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Shailesh Vats
 // Minimal Chrome DevTools Protocol helper: launch headless Chrome, capture frames, drive the real page.
 import { spawn } from 'node:child_process';
 import fs from 'node:fs';

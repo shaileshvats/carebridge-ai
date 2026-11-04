@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2026 Shailesh Vats
 """Turn tests/reports/latest.json (written by CareBridge.Test.Runner) into tests/reports/test-report.md."""
 import json, sys
 src = sys.argv[1] if len(sys.argv) > 1 else "tests/reports/latest.json"

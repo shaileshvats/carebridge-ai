@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2026 Shailesh Vats
 # Run unit tests, or unit + integration tests with --all. Writes tests/reports/latest.json.
 set -euo pipefail
 cd "$(dirname "$0")/.."

@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2026 Shailesh Vats
 # Wait until the CareBridge API reports a running production (no fixed sleeps).
 set -euo pipefail
 URL="${1:-http://localhost:52773/api/carebridge/health}"

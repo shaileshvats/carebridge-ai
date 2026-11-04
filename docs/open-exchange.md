@@ -5,7 +5,7 @@
 **Short description (one line):**
 Hospital lab-result interoperability where an IRIS AI Hub agent investigates HL7 exceptions and a deterministic policy gate governs every action.
 
-**Repository:** https://github.com/shaileshvats/carebridge-ai *(make public first)*
+**Repository:** https://github.com/shaileshvats/carebridge-ai
 
 **Category:** Technology Example / Solution
 **InterSystems technology:** InterSystems IRIS for Health, Interoperability, AI Hub, IPM, Docker
@@ -14,7 +14,7 @@ Hospital lab-result interoperability where an IRIS AI Hub agent investigates HL7
 **Contest:** InterSystems Programming Contest: AI Agents in Interoperability Workflows
 **Build:** AI Hub Early Access Community 2027.1.0AI.109.0 (IRIS for Health). Tested on ARM64 (Apple M2); the x64 image has the same tag but is untested
 **Publish in Package Manager:** yes (package name `carebridge-ai`)
-**Licence URL:** *(the LICENSE file once the owner approves one)*
+**Licence:** AGPL-3.0 (https://github.com/shaileshvats/carebridge-ai/blob/main/LICENSE)
 **Demo / video / article links:** *(add when published)*
 
 ## Long description

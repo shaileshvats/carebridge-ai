@@ -2,7 +2,7 @@
 
 Each entry: the decision, why, and what it rules out. Newest last.
 
-## D1. Target build: AI Hub Community 2027.1.0AI.109.0, IRIS for Health, ARM64 and x64
+## D1. Target build: AI Hub Community 2027.1.0AI.109.0, IRIS for Health (tested on ARM64)
 The organizer's latest clarification on the contest announcement says build 109 "is the newest release" and that judges will use the build each entry declares. The EAP portal (checked 2026-11-04) lists only 2027.1 builds; the 2026.3.0AI builds were removed. We use `irishealth_arm64-community-2027.1.0AI.109.0` on the owner's M2 Mac; the x64 file has the same tag. Community images include a private web server, so the dashboard and REST API are served by IRIS itself.
 
 ## D2. The image is never pushed anywhere
@@ -38,5 +38,8 @@ AI Hub's `openai` provider accepts `base_url`, so development used Gemma 4 E4B i
 ## D12. Single database for the namespace
 `CAREBRIDGE` holds code and data, so the IPM `${dbrole}` grants the web applications exactly the access they need, and the database lives on a Docker volume.
 
-## D13. Licence: pending owner approval
-The contest requires an open-source repository. OSI-approved licences (including Apache-2.0 and MIT) allow commercial use and resale; none of them prevents someone selling the work. Apache-2.0 is proposed for its explicit patent grant. No LICENSE file is published until the owner approves (see OWNER_ACTIONS.md).
+## D13. Licence: AGPL-3.0-only (owner decision, 2026-11-04)
+The contest requires an open-source repository, and the owner chose the GNU AGPL v3.0. Like every OSI licence it allows commercial use and resale. Its condition is that anyone who distributes a modified version, or offers it as a network service, must publish that source under the same terms. "Only" (rather than "or later") applies exactly the version the owner approved. Third-party material keeps its own licence (THIRD_PARTY_NOTICES.md). InterSystems IRIS and AI Hub are not part of this repository.
+
+## D14. Release evidence is generated, not hand-written
+`scripts/qc.sh` rebuilds from a wiped volume and writes a dated log to `docs/evidence/`. `scripts/ipm-check.sh` installs the module into a bare AI Hub container. Published numbers point at those files.

@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Shailesh Vats
 // Records the CareBridge demo from the real running application (headless Chrome + CDP).
 // Prerequisites: the stack is running (docker compose up), and for the LIVE segment an AI Hub provider is configured.
 // usage: node tools/video/record.mjs <framesDir> <manifest.json>

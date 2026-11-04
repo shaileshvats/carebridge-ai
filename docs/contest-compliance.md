@@ -16,7 +16,7 @@ Sources:
 | Fully functional, original | 11 scenarios run through the production; 37 unit and 8 integration tests | Done |
 | Starts with `docker compose up` | `docker compose up -d --build` after loading the EAP image (README) | Done |
 | Don't push the AI Hub image or derived images | Built locally as `carebridge-ai:local`; nothing pushed | Done |
-| Source on GitHub or GitLab, open source | Repository prepared. Licence and public visibility wait for the owner's approval | **Owner action** |
+| Source on GitHub or GitLab, open source | https://github.com/shaileshvats/carebridge-ai, AGPL-3.0-only | Done |
 | English README with installation and a demo or workflow description | README.md, docs/ | Done |
 | README states the EAP image, build, load and retag steps, LLM provider and key variable, start and check commands | README "Install" and "Configure live AI"; docs/installation.md | Done |
 | Published on IPM, with `SystemRequirements Version=">=2026.3" Interoperability="enabled"` | `module.xml` declares it. Installed with `zpm load` during the Docker build. Publication goes through Open Exchange ("Publish in Package Manager") | Manifest done; **owner submits** |

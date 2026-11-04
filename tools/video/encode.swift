@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Shailesh Vats
 // Encode captured frames into an H.264 MP4 with a caption bar and an optional corner badge.
 // usage: encode manifest.json out.mp4 [width height]
 import AVFoundation

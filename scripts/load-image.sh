@@ -1,4 +1,6 @@
 #!/usr/bin/env bash
+# SPDX-License-Identifier: AGPL-3.0-only
+# Copyright (C) 2026 Shailesh Vats
 # Load the AI Hub image you downloaded from the EAP portal and tag it with the name the Dockerfile expects.
 # Usage: scripts/load-image.sh ~/Downloads/irishealth_arm64-community-2027.1.0AI.109.0-docker.tar.gz
 set -euo pipefail

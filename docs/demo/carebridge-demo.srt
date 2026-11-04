@@ -79,6 +79,6 @@ The HIS now sends the registration (ADT^A04 over MLLP)…
 Agent activity: every run with its mode, model, duration, reported tokens, tool calls and policy verdict.
 
 21
-00:03:13,960 --> 00:03:24,960
+00:03:13,960 --> 00:03:24,100
 docker compose up · IPM package · 37 unit and 8 integration tests · synthetic data only.
 

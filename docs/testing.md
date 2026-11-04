@@ -31,7 +31,7 @@ The report is written to `tests/reports/latest.json`, with one row per test: cla
 | Duplicate delivery | `Safety:TestDeliveredContentIsUnique`; `Integration:TestDuplicateIsSuppressedAndDeliveredOnce` |
 | Downstream receiver unavailable, repeated retry | `Integration:TestRetryAfterDownstreamFailure`; `persistent-outage` scenario (retry budget enforced) |
 | Prompt injection in HL7 text | `Validator:TestInstructionTextIsFlaggedNotObeyed`; `Safety:TestAgentInputExcludesFreeTextNamesAndValues`; `prompt-injection` scenario |
-| IRIS restart | Verified 2026-11-04: `docker compose restart` → `scripts/wait-ready.sh`; production autostarted, all 23 messages and 21 agent runs still present |
+| IRIS restart | `scripts/qc.sh` step 4: `docker compose restart`, then compare message and agent-run counts and check that the production autostarts. Results are in the QC logs under docs/evidence/ |
 
 ## Results
 

@@ -42,3 +42,27 @@ REPLAY mode sends nothing anywhere. With a local OpenAI-compatible server (LM St
 
 ## Reporting
 Please report security issues privately to the repository owner rather than in a public issue.
+
+## Pre-publication audit (2026-11-04)
+
+The repository was audited before it was made public:
+
+- **gitleaks v8.21.2** (official container image):
+  - `git` mode over all 5 commits of history: no leaks.
+  - `dir` mode over the working tree: no leaks.
+- Manual grep over every revision (`git log --all -p`) for:
+  - local paths (`/Users/`, scratch directories) and usernames
+  - private IP ranges
+  - email addresses other than commit metadata
+  - API key, token and private-key patterns
+  - password assignments
+
+  None found.
+- Binary assets (screenshots, poster, video): checked for embedded paths and identifying metadata, and none was found. Screenshots and video frames show only the CareBridge viewport (no browser chrome, no address bar). The cards are local HTML.
+- Evidence and test reports: contain only synthetic identifiers, the IRIS version string and timings.
+- `.env`, `.env.live`, `*.key` and `*.tar.gz` are git-ignored, and `.env.example` holds placeholders only.
+
+Limitations of the audit:
+
+- Pattern-based scanners can miss unusual secret formats.
+- Commit author metadata (name and email) is public by design.

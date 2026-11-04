@@ -1,3 +1,5 @@
+// SPDX-License-Identifier: AGPL-3.0-only
+// Copyright (C) 2026 Shailesh Vats
 /* CareBridge AI dashboard. Plain JavaScript; every value shown comes from /api/carebridge. */
 (function () {
   "use strict";
@@ -308,7 +310,7 @@
             : "REPLAY: the production, tools, contract validator and policy gate all run for real; the agent's reply is a scripted fixture. No API key needed."}</p>
           ${mode.modeLocked ? '<p class="muted" style="margin:0">Mode switching is disabled on this deployment.</p>' :
             `<button id="toggle-mode" ${mode.mode === "REPLAY" && !mode.liveAvailable ? "disabled" : ""}>Switch to ${mode.mode === "LIVE" ? "REPLAY" : "LIVE"}</button>
-             ${!mode.liveAvailable ? '<span class="muted">AI Hub classes not available in this instance.</span>' : (mode.mode === "REPLAY" && !mode.keyConfigured ? '<span class="muted">No model key or endpoint configured; LIVE runs will fall back to manual review.</span>' : "")}`}
+             ${!mode.liveAvailable ? '<span class="muted">AI Hub classes not available in this instance.</span>' : (mode.mode === "REPLAY" && !mode.keyConfigured && !mode.baseUrl ? '<span class="muted">No model key or endpoint configured; LIVE runs will fall back to manual review.</span>' : "")}`}
         </div>
         <div id="report"></div>
         <h2 style="margin:1.25rem 0 .5rem">Core workflow</h2>

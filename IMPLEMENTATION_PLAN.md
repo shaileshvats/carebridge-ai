@@ -16,7 +16,7 @@ Priorities follow the build directive: P0 before P1 before P2.
 | 10 | Dashboard: overview, explorer, trace, review, agent activity, scenarios | P1 | Done |
 | 11 | Observability: AgentRun, ToolCall, PolicyEvaluation, AuditEvent, usage report | P1 | Done |
 | 12 | IPM module with SystemRequirements | P1 | Done (installed via `zpm load` in the build); publication is the owner's |
-| 13 | GitHub repository | P1 | Private repo pushed; public after licence approval |
+| 13 | GitHub repository | P1 | Public, AGPL-3.0 |
 | 14 | Open Exchange listing | P1 | Draft ready; submission is the owner's |
 | 15 | Developer Community article | P2 | Draft ready |
 | 16 | Demo video | P2 | Script ready; recording pending |

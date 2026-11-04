@@ -1,6 +1,6 @@
 # Project status
 
-_Last updated: 2026-11-04 (IST)_
+_Last updated: 2026-11-04 (IST), after the release QC_
 
 ## Working and verified
 
@@ -10,8 +10,9 @@ _Last updated: 2026-11-04 (IST)_
 - **AI Hub agent:** `CareBridge.ExceptionInvestigator` (`%AI.Agent`), with a six-tool read-only `%AI.ToolSet`, an audit policy and an authorization policy.
 - **LIVE runs:**
   - Verified with Qwen3-4B-Instruct-2507 (LM Studio) through AI Hub's `openai` provider with `base_url`.
-  - Two full runs: 11/11 scenarios with safe outcomes and 12/12 valid recommendations each. One run: 43,948 prompt and 1,680 completion tokens; the other: 43,967 and 1,665. Both averaged 6.7 s per run.
+  - Three full runs, the last configured exactly as the README documents. Each: 11/11 scenarios with safe outcomes and 12/12 valid recommendations, about 44,000 prompt and 1,700 completion tokens, 6.7–8.3 s average per agent run.
   - Evidence: `docs/evidence/`.
+- **IPM:** a clean install into a bare AI Hub container works in an interop namespace and is refused in a non-interop one (`docs/evidence/ipm-check-*.md`).
 - **REPLAY:** 11/11 scenarios give the exact expected outcome, with no model call.
 - **Policy gate:** agent and human decisions, every rule persisted.
 - **Tests:** 37 unit tests and 8 integration tests (see docs/testing.md and tests/reports).

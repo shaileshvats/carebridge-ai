@@ -75,12 +75,13 @@ ClassMethod ProviderSettings() As %DynamicObject
 	Set baseUrl = ..Setting("LLMBaseURL", "CAREBRIDGE_LLM_BASE_URL", "")
 	Set key = $SYSTEM.Util.GetEnviron("CAREBRIDGE_LLM_API_KEY")
 	If key = "" Set key = $SYSTEM.Util.GetEnviron($CASE(provider, "anthropic":"ANTHROPIC_API_KEY", "gemini":"GEMINI_API_KEY", :"OPENAI_API_KEY"))
+	Set hasKey = (key '= "")
 	// Local OpenAI-compatible servers ignore the key but the client requires one.
 	If (key = "") && (baseUrl '= "") Set key = "local-no-key"
 	Set timeout = +..Setting("LLMTimeoutSeconds", "CAREBRIDGE_LLM_TIMEOUT", 120)
 	Set settings = {"api_key":(key), "http_config":{"connect_timeout_secs":10, "request_timeout_secs":(timeout)}}
 	If baseUrl '= "" Set settings."base_url" = baseUrl
-	Quit {"provider":(provider), "model":(model), "baseUrl":(baseUrl), "hasKey":(key '= ""), "settings":(settings)}
+	Quit {"provider":(provider), "model":(model), "baseUrl":(baseUrl), "hasKey":(hasKey), "settings":(settings)}
 }
 
 ClassMethod Setting(name As %String, env As %String, default As %String) As %String
