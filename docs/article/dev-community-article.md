@@ -1,6 +1,6 @@
 # CareBridge AI: Building a Governed Hospital Interoperability Agent with InterSystems IRIS AI Hub
 
-A laboratory result can be perfectly valid HL7 and still be unsafe to route. This article covers how I built **CareBridge AI**, an IRIS interoperability production where an **IRIS AI Hub agent** investigates exceptions and a **deterministic policy gate** decides what may actually happen. It's my entry for the *AI Agents in Interoperability Workflows* contest.
+A laboratory result can be a perfectly valid HL7 message and still be unsafe to route. This article covers how I built **CareBridge AI**, an InterSystems IRIS for Health interoperability solution where an **IRIS AI Hub agent** investigates exceptions and a **deterministic policy gate** decides what may actually happen. It's my entry for the *AI Agents in Interoperability Workflows* contest.
 
 - Source code (GNU AGPL-3.0-only): https://github.com/shaileshvats/carebridge-ai
 - Demo video (3:24, real application footage): https://www.youtube.com/watch?v=w-1bHYc1eEM (no-login MP4 download: https://github.com/shaileshvats/carebridge-ai/raw/v1.0.0/docs/demo/carebridge-demo.mp4)
@@ -22,7 +22,7 @@ Each one needs some investigation (look up the patient, the order, the history) 
 
 ## 2. Why lab results
 
-ORU^R01 results are high-volume and well understood, and the failures this project handles fit a small, enumerable set. That makes them a good fit for a *bounded* agent. The decision space can be written down as an enum, and every option can be checked against the state of the registry. It also gives a clear safety rule: a result with an open exception must not reach the patient record without a person.
+ORU^R01 results are high-volume and well understood, and the failures this project handles fit a small, enumerable set. That makes them a good fit for a *bounded* agent. The decision space can be written down as an enum, and every option can be checked against the state of the registry. It also gives a clear safety rule: an unresolved exception may only be acted on when the deterministic policy gate permits the action, and designated cases, such as ambiguous patient identity or accepting a result that has an exception, always require human review.
 
 ## 3. Architecture
 
@@ -49,6 +49,8 @@ Three simulated systems talk to one IRIS for Health namespace:
 - The LIS sends ORU^R01 results on port 7011.
 - An EMR receiver accepts delivered results.
 
+Clean messages bypass the agent: when validation finds no exception, the router delivers the result directly. The agent is invoked only for validation exceptions and for failed delivery attempts (the `DOWNSTREAM_UNAVAILABLE` case).
+
 Everything that receives, decides or acts is a production component. The dashboard reads persisted state, submits review decisions through the Workflow API, and runs the demo controls (send scenarios, reset). The screenshot shows one message's trace in that dashboard.
 
 ## 4. Business service, process and operations
@@ -58,7 +60,7 @@ Everything that receives, decides or acts is a production component. The dashboa
 | `LIS.ORU.In`, `HIS.ADT.In` | `EnsLib.HL7.Service.TCPService` | MLLP listeners with immediate ACK |
 | `CareBridge.HISRegistry` | Business process | Applies ADT/ORM to the synthetic registry |
 | `CareBridge.LabResultRouter` | Business process (code-based) | Registers an immutable copy, validates, orchestrates the agent and the gate, executes, handles the Workflow round trip |
-| `CareBridge.ExceptionInvestigator` | Business operation | Runs the AI Hub agent (LIVE) or the replay adapter (REPLAY); persists the run |
+| `CareBridge.ExceptionInvestigator` | Business operation `CareBridge.Operation.ExceptionInvestigator` | In LIVE mode, invokes the separate `%AI.Agent` subclass `CareBridge.ExceptionInvestigator` (section 5); in REPLAY mode, uses the replay adapter; persists the run |
 | `EMR.ClinicalReceiver` | Business operation | Simulated record system; a unique index makes duplicate delivery impossible |
 | `CareBridge.Quarantine`, `LIS.RejectNotifier` | Business operations | Quarantine queue; MSA\|AR reject ACK |
 | `CareBridge.ManualReview` | `EnsLib.Workflow.Operation` | Hands tasks to the reviewer role |
@@ -117,8 +119,8 @@ The point is that the set of things that *can* happen doesn't depend on what the
 Cases that need a person become `EnsLib.Workflow.TaskRequest`s for the `CareBridge.ManualReview` role. Each task offers only the actions the policy allows for that exception type. The reviewer's choice and note return to the router's `OnResponse` and pass through the **same** gate, re-checked against current state:
 
 1. In the *unknown-patient* scenario, a reviewer's ACCEPT is refused because the MRN still isn't registered, and a fresh task is issued.
-2. The HIS then sends an ADT^A04.
-3. The same decision is approved, and the result is delivered.
+2. The HIS then sends an ADT^A04, which registers the patient in the registry.
+3. The reviewer resubmits the same decision on the new task. The gate re-evaluates it against the current state, approves it, and the result is delivered.
 
 Two Workflow API details mattered:
 
@@ -173,10 +175,10 @@ Measured results (machine and build as above; the evidence files are in the repo
 |---|---|---|
 | Unit and integration tests | REPLAY | 45/45 (37 unit, 8 integration) |
 | Demo scenarios | REPLAY | 11/11 exact expected outcome |
-| Demo scenarios, 3 full runs (Qwen3-4B-Instruct-2507) | LIVE | 11/11 safe outcome in every run; 12/12 valid recommendations in every run |
+| Demo scenarios: the same 11-scenario suite repeated 3 times (Qwen3-4B-Instruct-2507) | LIVE | 11/11 safe outcomes and 12/12 valid recommendations in each repetition. These are 3 repetitions of one suite, not 33 independent scenarios |
 | Tokens per full run (12 agent runs) | LIVE | 43,948 / 1,680 · 43,967 / 1,665 · 43,958 / 1,703 (in / out) |
 | Time per agent run | LIVE | 6.7 s, 6.7 s and 8.3 s average; the slowest single run was 22.4 s, on a busy laptop |
-| Model cost | LIVE | $0 (local inference) |
+| Model cost | LIVE | $0 hosted API cost (local inference; excludes electricity and hardware costs) |
 | Clean start on an empty volume, image already built | REPLAY | 9–10 s to a running production (two QC runs) |
 | IPM install into a bare AI Hub container | — | Installs, starts and routes in an interop namespace; refused in a non-interop namespace |
 
@@ -220,4 +222,4 @@ open http://localhost:52773/carebridge/index.html
 
 REPLAY mode needs no key. The README explains how to switch to LIVE with LM Studio and Qwen3-4B-Instruct-2507.
 
-The source code is at https://github.com/shaileshvats/carebridge-ai under the GNU Affero General Public License v3.0 only. Like any open-source licence, the AGPL allows commercial use. Its condition is that anyone who distributes a modified version, or runs it as a network service, publishes their source under the same terms. InterSystems IRIS and AI Hub are separate products and are not covered.
+The source code is at https://github.com/shaileshvats/carebridge-ai under the GNU Affero General Public License, version 3 only (SPDX identifier `AGPL-3.0-only`; no later versions). Like any open-source licence, it allows commercial use. Its main conditions are that anyone who distributes the software, modified or not, must make the corresponding source available under the same licence, and anyone who modifies it and lets users interact with it over a network must offer those users the source of the modified version. InterSystems IRIS and AI Hub are separate products and are not covered.
