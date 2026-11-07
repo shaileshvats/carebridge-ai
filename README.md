@@ -10,7 +10,7 @@ A simulated laboratory sends HL7 v2 results to an IRIS interoperability producti
 - **Tested on:** AI Hub Early Access Community **2027.1.0AI.109.0**, IRIS for Health, **ARM64** (Apple M2). x64 and other builds are untested; see [limitations](docs/limitations.md).
 - **Licence:** [AGPL-3.0-only](LICENSE).
 
-**Demo video** (3 min 24 s, real application footage, synthetic-voice narration): [docs/demo/carebridge-demo.mp4](docs/demo/carebridge-demo.mp4) · [captions](docs/demo/carebridge-demo.srt)
+**Demo video** (3 min 24 s, real application footage, synthetic-voice narration): [download MP4](https://github.com/shaileshvats/carebridge-ai/raw/v1.0.0/docs/demo/carebridge-demo.mp4) (no login needed) · [captions](docs/demo/carebridge-demo.srt)
 
 | The agent investigates with read-only tools (LIVE, local model) | The policy gate refuses an unsafe recommendation |
 |---|---|

@@ -39,6 +39,7 @@ NOT TESTED / LIMITATIONS
 
 LINKS
 Source code (AGPL-3.0): https://github.com/shaileshvats/carebridge-ai
+Download this video (no login): https://github.com/shaileshvats/carebridge-ai/raw/v1.0.0/docs/demo/carebridge-demo.mp4
 Contest: https://community.intersystems.com/post/intersystems-programming-contest-ai-agents-interoperability-workflows
 
 CHAPTERS

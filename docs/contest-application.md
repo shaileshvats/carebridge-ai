@@ -37,7 +37,7 @@
 | Item | URL | Status |
 |---|---|---|
 | Source (AGPL-3.0) | https://github.com/shaileshvats/carebridge-ai | Public |
-| Demo video | `docs/demo/carebridge-demo.mp4` in the repo; YouTube link after upload | Video ready; upload is the owner's |
+| Demo video | https://github.com/shaileshvats/carebridge-ai/raw/v1.0.0/docs/demo/carebridge-demo.mp4 (no-login download) | Ready; YouTube upload optional |
 | IPM package | https://openexchange.intersystems.com/package/… (after OEX publication) | Owner submits |
 | DC article | after publication | Draft ready |
 
