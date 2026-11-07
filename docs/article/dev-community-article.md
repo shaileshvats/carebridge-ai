@@ -41,6 +41,8 @@ ORU^R01 results are high-volume and well understood, and the failures this proje
                                                                                  to the gate)
 ```
 
+![CareBridge production architecture](https://raw.githubusercontent.com/shaileshvats/carebridge-ai/main/docs/screenshots/architecture-production.png)
+
 Three simulated systems talk to one IRIS for Health namespace:
 
 - The HIS sends ADT and ORM messages over MLLP on port 7010.
