@@ -3,7 +3,7 @@
 A laboratory result can be perfectly valid HL7 and still be unsafe to route. This article covers how I built **CareBridge AI**, an IRIS interoperability production where an **IRIS AI Hub agent** investigates exceptions and a **deterministic policy gate** decides what may actually happen. It's my entry for the *AI Agents in Interoperability Workflows* contest.
 
 - Source code (GNU AGPL-3.0-only): https://github.com/shaileshvats/carebridge-ai
-- Demo video (3:24, real application footage, no-login download): https://github.com/shaileshvats/carebridge-ai/raw/v1.0.0/docs/demo/carebridge-demo.mp4
+- Demo video (3:24, real application footage): https://www.youtube.com/watch?v=w-1bHYc1eEM (no-login MP4 download: https://github.com/shaileshvats/carebridge-ai/raw/v1.0.0/docs/demo/carebridge-demo.mp4)
 - Contest: https://community.intersystems.com/post/intersystems-programming-contest-ai-agents-interoperability-workflows
 - Tested on AI Hub Early Access Community **2027.1.0AI.109.0**, IRIS for Health, **ARM64** (Apple M2, 16 GB). Nothing else was tested. All data is synthetic.
 

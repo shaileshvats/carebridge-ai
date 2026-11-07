@@ -32,13 +32,13 @@ Sources:
 | IPM package | 2 | Manifest ready; counts once published |
 | Online demo | 2 | Not deployed (needs hosting; a static recording does not qualify) |
 | First DC article | 2 | Draft in docs/article/; publish needs the owner |
-| YouTube video | 3 | Needs recording and upload |
+| Video | 3 | Published: https://www.youtube.com/watch?v=w-1bHYc1eEM, plus a no-login MP4 download |
 | Vector Search | 2 | Not used |
 | Embedded Python | 3 | Not used |
 | PEX (Java/.NET) | 3 | Not used |
 | Community Opportunity idea | 4 | Not claimed |
 | Bug reports | 2–3 | None filed |
-| Questionnaire | 1 | Owner |
+| Questionnaire | 1 | Submitted by the owner |
 
 Bonuses were adopted only where they are part of the design: Workflow for human tasks, the adapter for retries. Nothing was added just to collect points.
 

@@ -37,7 +37,7 @@
 | Item | URL | Status |
 |---|---|---|
 | Source (AGPL-3.0) | https://github.com/shaileshvats/carebridge-ai | Public |
-| Demo video | https://github.com/shaileshvats/carebridge-ai/raw/v1.0.0/docs/demo/carebridge-demo.mp4 (no-login download) | Ready; YouTube upload optional |
+| Demo video | https://www.youtube.com/watch?v=w-1bHYc1eEM and https://github.com/shaileshvats/carebridge-ai/raw/v1.0.0/docs/demo/carebridge-demo.mp4 (no-login download) | Published on YouTube; both links in the Open Exchange draft |
 | IPM package | https://openexchange.intersystems.com/package/… (after OEX publication) | Owner submits |
 | DC article | after publication | Draft ready |
 
@@ -58,7 +58,7 @@
 | Docker container | `docker-compose.yml`, `Dockerfile` |
 | IPM package | `module.xml` (after publication) |
 | DC article | after publication |
-| YouTube video | after upload |
+| Video | https://www.youtube.com/watch?v=w-1bHYc1eEM plus the no-login MP4 download |
 
 ## Eligibility and judging risks
 
