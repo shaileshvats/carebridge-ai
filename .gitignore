@@ -13,3 +13,4 @@ tests/reports/*.local.*
 .DS_Store
 node_modules/
 .env.live
+release/youtube-upload/*.mp4

@@ -1,0 +1,53 @@
+CareBridge AI is an open-source InterSystems IRIS for Health interoperability production in which an IRIS AI Hub agent investigates hospital lab-result exceptions, and a deterministic policy gate decides what the production may do. All patients, orders and values in this demo are synthetic.
+
+THE PROBLEM
+A lab result can be valid HL7 and still be unsafe to route: the patient isn't registered, the order doesn't exist or belongs to another patient, the lab resent a result that was already delivered, a required field is empty, or the clinical record system is down. Interface teams investigate these by hand, and identity questions must always reach a person.
+
+WHAT THE IRIS PRODUCTION DOES
+- A simulated laboratory sends HL7 v2 ORU^R01 results over MLLP. A simulated HIS keeps the patient and order registry current with ADT and ORM messages.
+- The LabResultRouter business process stores each original message immutably, validates it, and delivers clean results to a simulated EMR.
+- When there is an exception, it calls the ExceptionInvestigator business operation, which runs an IRIS AI Hub agent (%AI.Agent).
+
+HOW THE AGENT INVESTIGATES
+The agent receives a sanitised case (identifiers, codes and findings only; no names, result values or free text) and six read-only tools: LookupPatient, LookupOrder, OrdersForPatient, MessageHistory, DuplicateStatus and ValidationFindings. AI Hub audit and authorization policies record or deny every tool call. The agent replies with a strict JSON recommendation.
+
+WHY THE POLICY GATE IS AUTHORITATIVE
+A deterministic policy gate checks every recommendation:
+- the output contract
+- that every evidence code was actually observed
+- the actions permitted for that exception type
+- identity rules
+- the retry budget
+- duplicate delivery
+
+The agent can never accept a result that has an exception. Invalid output, timeouts and provider errors fall back to manual review.
+
+HUMAN REVIEW AND RETRIES
+Cases that need a person become IRIS Workflow Engine tasks. The reviewer's decision passes through the same policy gate and is re-checked against current state. Delivery failures are retried after a delay by a custom inbound adapter, within a retry budget.
+
+REPLAY AND LIVE MODES
+In REPLAY mode, the production, tools, contract validator and policy gate all run for real; only the agent's reply is a scripted fixture, so no API key is needed. LIVE mode calls a real model through AI Hub. In this video, LIVE uses a local Qwen3-4B-Instruct-2507 model in LM Studio. The badge in the corner shows which mode each segment uses. Waiting is sped up, and the narration is a synthetic voice.
+
+TESTED ENVIRONMENT
+InterSystems IRIS for Health, AI Hub Early Access Community build 2027.1.0AI.109.0, ARM64 (Apple M2, 16 GB), Docker.
+
+NOT TESTED / LIMITATIONS
+- The x64 image, build 154, and hosted LLM providers (OpenAI, Anthropic, Gemini) were not tested.
+- Synthetic data only. Not clinically validated. No HIPAA or other regulatory claim.
+- One workflow: HL7 ORU^R01 lab results with six exception types. The HIS, LIS and EMR are simulations.
+- The dashboard is an unauthenticated local demo. There is no public online demo.
+
+LINKS
+Source code (AGPL-3.0): https://github.com/shaileshvats/carebridge-ai
+Contest: https://community.intersystems.com/post/intersystems-programming-contest-ai-agents-interoperability-workflows
+
+CHAPTERS
+0:00 CareBridge AI
+0:08 The problem
+0:20 Architecture
+0:37 Dashboard and a clean result
+1:00 LIVE: AI Hub agent investigates an unknown order
+1:39 Adversarial test: unsafe recommendation blocked
+2:06 Human review with the Workflow Engine
+3:04 Agent activity and tokens
+3:13 Install and test
