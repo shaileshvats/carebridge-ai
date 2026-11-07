@@ -1,7 +1,7 @@
 # Article metadata
 
 - **Title:** CareBridge AI: Building a Governed Hospital Interoperability Agent with InterSystems IRIS AI Hub
-- **Where:** InterSystems Developer Community, published by the owner. Not published yet.
+- **Where:** InterSystems Developer Community, published by the owner on 2026-11-07: https://community.intersystems.com/post/carebridge-ai-building-governed-hospital-interoperability-agent-intersystems-iris-ai-hub
 - **Suggested tags:** #Contest, #AI, #Interoperability, #HL7, #Healthcare, #InterSystems IRIS for Health, #Docker, #ObjectScript Package Manager (IPM)
 - **Summary (for the post teaser):** An IRIS AI Hub agent investigates HL7 lab-result exceptions with read-only tools, and a deterministic policy gate decides what the production may execute. The post covers how it works, the evidence from REPLAY and LIVE runs, tokens and cost with local models, observability, and the AI Hub lessons learned.
 - **Cover image concept:** the CareBridge bridge mark on a deep teal background, with three small system labels (HIS, LIS, EMR) joined by lines into one shield-shaped gate. No fake UI and no unreadable generated text.

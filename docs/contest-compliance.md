@@ -31,7 +31,7 @@ Sources:
 | Docker container | 2 | Used |
 | IPM package | 2 | Manifest ready; counts once published |
 | Online demo | 2 | Not deployed (needs hosting; a static recording does not qualify) |
-| First DC article | 2 | Draft in docs/article/; publish needs the owner |
+| First DC article | 2 | Published: https://community.intersystems.com/post/carebridge-ai-building-governed-hospital-interoperability-agent-intersystems-iris-ai-hub |
 | Video | 3 | Published: https://www.youtube.com/watch?v=w-1bHYc1eEM, plus a no-login MP4 download |
 | Vector Search | 2 | Not used |
 | Embedded Python | 3 | Not used |

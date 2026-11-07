@@ -12,6 +12,8 @@ A simulated laboratory sends HL7 v2 results to an IRIS interoperability producti
 
 **Demo video** (3 min 24 s, real application footage, synthetic-voice narration): [YouTube](https://www.youtube.com/watch?v=w-1bHYc1eEM) · [download MP4](https://github.com/shaileshvats/carebridge-ai/raw/v1.0.0/docs/demo/carebridge-demo.mp4) (no login needed) · [captions](docs/demo/carebridge-demo.srt)
 
+**Article:** [CareBridge AI: Building a Governed Hospital Interoperability Agent with InterSystems IRIS AI Hub](https://community.intersystems.com/post/carebridge-ai-building-governed-hospital-interoperability-agent-intersystems-iris-ai-hub) (InterSystems Developer Community)
+
 | The agent investigates with read-only tools (LIVE, local model) | The policy gate refuses an unsafe recommendation |
 |---|---|
 | ![Agent run with tool calls](docs/screenshots/agent-tool-calls-live.jpg) | ![Policy gate rejecting ACCEPT](docs/screenshots/policy-gate-unsafe-action.jpg) |
