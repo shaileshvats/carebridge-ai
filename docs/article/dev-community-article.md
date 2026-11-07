@@ -133,7 +133,7 @@ When the EMR receiver fails, the router opens a `DOWNSTREAM_UNAVAILABLE` case. I
 
 ## 9. Live local model integration
 
-AI Hub's `openai` provider accepts a `base_url`, so any OpenAI-compatible server works without code changes. I only tested local models, so none of these runs cost anything:
+AI Hub's `openai` provider accepts a `base_url`, so any OpenAI-compatible server works without code changes. I only tested local models. None of these runs incurred hosted model API charges; inference ran locally.
 
 | Model | Result |
 |---|---|
